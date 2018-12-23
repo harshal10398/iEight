@@ -1,9 +1,11 @@
 package com.iEight.util;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class StaticDatabaseConnectionHolder {
     private static Connection connection;
@@ -11,11 +13,14 @@ public class StaticDatabaseConnectionHolder {
 
     private static void initConnection() {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection("jdbc:mysql//localhost:3306/loom", "application", "1StackOn!application");
-        } catch (ClassNotFoundException cnfe) {
+//            Class.forName("com.mysql.jdbc.Driver");
+//            System.out.println("Driver loaded!");
+
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/loom", "application", "1StackOn!application");
+
+        } /*catch (ClassNotFoundException cnfe) {
             cnfe.printStackTrace();
-        } catch (SQLException sqle) {
+        }*/ catch (SQLException sqle) {
             sqle.printStackTrace();
         }
     }
@@ -36,4 +41,14 @@ public class StaticDatabaseConnectionHolder {
 
         return statement;
     }
+    public static ArrayNode getResult(String queryString){
+        ResultSet rs = null;
+        try {
+            rs = getStatement().executeQuery(queryString);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ResultSetToJson.getJSON(rs);
+    }
+
 }

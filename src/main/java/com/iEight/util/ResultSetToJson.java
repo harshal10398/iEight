@@ -1,40 +1,54 @@
 package com.iEight.util;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+//import org.json.JSONArray;
+//import org.json.JSONObject;
+
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ResultSetToJson {
-    public static JSONArray getJSON(ResultSet resultSet) {
+    public static ArrayNode getJSON(ResultSet resultSet) {
 
-        JSONArray jsonArray = new JSONArray();
+        ObjectMapper objectMapper=new ObjectMapper();
+        ArrayNode arrayNode=objectMapper.createArrayNode();
+
         try {
             int totalColumns = resultSet.getMetaData().getColumnCount();
             while (resultSet.next()) {
 
                 // for each record, create a new JSON object
-                JSONObject jsonObject = new JSONObject();
+                ObjectNode objectNode=objectMapper.createObjectNode();
 
                 for (int i = 0; i < totalColumns; i++) {
 
                     // for each cell, put value with columnname in object
 
-                    jsonObject.put(
+                    objectNode.put(
                             resultSet.getMetaData().getColumnLabel(i + 1).toLowerCase(),
-                            resultSet.getObject(i + 1)
+                            String.valueOf(resultSet.getObject(i + 1))
                     );
                 }
 
                 // put early made JOSN object into JSON array
-                jsonArray.put(jsonObject);
+                arrayNode.add(objectNode);
 
             }
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         }
-        System.out.println(jsonArray.toString(4));
-        return jsonArray;
+
+        return arrayNode;
+    }
+    public static JsonNode getOk(){
+        ObjectMapper objectMapper=new ObjectMapper();
+        ObjectNode objectNode=objectMapper.createObjectNode();
+        objectNode.put("ok",true);
+        return objectNode;
     }
 }

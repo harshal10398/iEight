@@ -1,14 +1,17 @@
 plugins {
     id 'java'
     id 'war'
-//    id 'org.gretty' version '2.3.1'
     id 'org.springframework.boot' version '2.1.1.RELEASE'
     id 'idea'
-
 }
 
 group 'iEight'
 version '1.0-SNAPSHOT'
+
+compileJava{
+//    sourceCompatibility JavaVersion.VERSION_1_8.toString()
+//    targetCompatibility JavaVersion.VERSION_1_8.toString()
+}
 
 bootJar{
     baseName = 'iEight-rest-service'
@@ -23,6 +26,5 @@ repositories {
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web:+'
     compile 'mysql:mysql-connector-java:+'
-    compile 'org.json:json:+'
     testCompile 'org.springframework.boot:spring-boot-starter-test:+'
 }
