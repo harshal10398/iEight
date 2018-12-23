@@ -17,7 +17,7 @@ public class Application {
         if(SystemTray.isSupported()){
             SystemTray systemTray=SystemTray.getSystemTray();
             TrayIcon trayIcon = new TrayIcon();
-            
+
             trayIcon.setImage();
             systemTray.add();
         }
