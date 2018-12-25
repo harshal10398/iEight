@@ -51,4 +51,12 @@ public class ResultSetToJson {
         objectNode.put("ok",true);
         return objectNode;
     }
+
+    public static JsonNode getResponse(int code, String message){
+        ObjectMapper objectMapper=new ObjectMapper();
+        ObjectNode objectNode=objectMapper.createObjectNode().
+                put("state",code).
+                put("message",message);
+        return objectNode;
+    }
 }

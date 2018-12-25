@@ -6,7 +6,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -18,26 +23,41 @@ import java.util.logging.Logger;
 @SpringBootApplication
 public class Application {
     private static final Logger logger=Logger.getLogger(Application.class.getName());
+    private static ConfigurableApplicationContext context;
     public static void main(String[] args) throws IOException, AWTException {
+
         if(SystemTray.isSupported()){
 
             SystemTray systemTray=SystemTray.getSystemTray();
-
             try {
 
+                final Image icon=ImageIO.read(
+                        Application.class.getResourceAsStream(
+                                "/public/ic_launcher/res/mipmap-hdpi/ic_launcher.png"));
 
-                Image icon=ImageIO.read(Application.class.getResourceAsStream("/public/ic_launcher.png"));
+                final PopupMenu popupMenu = new PopupMenu("iEight server running!");
+                MenuItem exitItem=new MenuItem("Exit");
+                exitItem.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent actionEvent) {
+                        logger.log(Level.SEVERE,actionEvent.getActionCommand()+"|"+actionEvent.paramString()+"|"+actionEvent.getSource().getClass().getName());
+                        SpringApplication.exit(context);
+                        System.exit(0);
+                    }
+                });
+                popupMenu.add(exitItem);
 
-                TrayIcon trayIcon = new TrayIcon(icon,"iEight server running!");
-
+                final TrayIcon trayIcon = new TrayIcon(icon,"iEight server running!",popupMenu);
                 trayIcon.setImageAutoSize(true);
-                systemTray.add(trayIcon);
+                trayIcon.setPopupMenu(popupMenu);
 
+                systemTray.add(trayIcon);
             }
             catch(Exception e){
                 e.printStackTrace();
             }
         }
-        SpringApplication.run(Application.class, args);
+        context=SpringApplication.run(Application.class, args);
+
     }
 }
