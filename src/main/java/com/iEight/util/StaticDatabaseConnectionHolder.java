@@ -48,5 +48,14 @@ public class StaticDatabaseConnectionHolder {
         }
         return ResultSetToJson.getJSON(rs);
     }
+    public static PreparedStatement getPreparedStatement(String queryString) {
 
+        PreparedStatement returnStatement=null;
+        try {
+            returnStatement = getConnection().prepareStatement(queryString);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return returnStatement;
+    }
 }

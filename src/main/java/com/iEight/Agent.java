@@ -14,22 +14,41 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
 public class Agent {
+    private static final String getAllAgentsQuery="SELECT * FROM AGENT";
+    private static final String getSpecificAgentQuery="SELECT * FROM AGENT WHERE AGENT_PHONE = '?'";
+    private static final String updateAgentQuery="UPDATE AGENT SET AGENT_NAME = '?' WHERE AGENT_PHONE = '?'";
+    private static final String addAgentQuery="INSERT INTO AGENT(AGENT_PHONE,AGENT_NAME) VALUE('?','?')";
+    private static final String deleteAgentQuery="";
+
+    private static final PreparedStatement getAllAgentsStatement =
+            StaticDatabaseConnectionHolder.getPreparedStatement(getAllAgentsQuery);
+    private static final PreparedStatement getSpecificAgentStatement =
+            StaticDatabaseConnectionHolder.getPreparedStatement(getSpecificAgentQuery);
+    private static final PreparedStatement updateAgentStatement =
+            StaticDatabaseConnectionHolder.getPreparedStatement(updateAgentQuery);
+    private static final PreparedStatement addAgentStatement =
+            StaticDatabaseConnectionHolder.getPreparedStatement(addAgentQuery);
+    private static final PreparedStatement deleteAgentStatement =
+            StaticDatabaseConnectionHolder.getPreparedStatement(deleteAgentQuery);
+
     private static final Logger logger=Logger.getLogger(Agent.class.getName());
     @RequestMapping(
             path = "/service/agent/all",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public JsonNode getAgents()
-    {
-        logger.log(Level.INFO,"Request captured!");
-        return StaticDatabaseConnectionHolder.getResult("SELECT * FROM AGENT");
+    public JsonNode getAgents() throws SQLException {
+
+        JsonNode returnNode = ResultSetToJson.getJSON(getAllAgentsStatement.executeQuery());
+
+        return returnNode;
     }
 
     @RequestMapping(
@@ -39,11 +58,17 @@ public class Agent {
     )
     public JsonNode getSpecificAgent(
             @RequestParam(name = "agent_phone", required = true, defaultValue = "") String agentPhone
-    )
-    {
-        return StaticDatabaseConnectionHolder.getResult("SELECT * FROM AGENT WHERE AGENT_PHONE = "+agentPhone).get(0);
+    ) throws SQLException {
+//        return StaticDatabaseConnectionHolder.getResult("SELECT * FROM AGENT WHERE AGENT_PHONE = "+agentPhone).get(0);
+        JsonNode returnNode;
+        if(agentPhone.isBlank())
+            returnNode = ResultSetToJson.getResponse(-1,"Null value provided :(");
+        else {
+            getSpecificAgentStatement.setString(1, agentPhone);
+            returnNode = ResultSetToJson.getJSON(getSpecificAgentStatement.executeQuery());
+        }
+        return returnNode;
     }
-
 
 
     @RequestMapping(
@@ -52,12 +77,27 @@ public class Agent {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE )
     public JsonNode updateAgent(
-            @RequestParam(name = "agent_phone",required = true, defaultValue = "") String agnetPhone,
+            @RequestParam(name = "agent_phone",required = true, defaultValue = "") String agentPhone,
             @RequestParam(name = "agent_name",required = true, defaultValue = "") String agentNameNew
     ) throws SQLException
     {
-        StaticDatabaseConnectionHolder.getStatement().executeUpdate("UPDATE AGENT SET AGENT_NAME = "+agentNameNew+" WHERE AGENT_PHONE = "+agnetPhone);
-        return ResultSetToJson.getOk();
+        JsonNode returnNode = null;
+        if(agentPhone.contains("*") || agentNameNew.contains("*"))
+            returnNode = ResultSetToJson.getResponse(-1,"Dont try to hack us!");
+        else if(agentPhone.isBlank() || agentNameNew.isBlank())
+            returnNode = ResultSetToJson.getResponse(-1,"Null value provided!");
+        else {
+            updateAgentStatement.setString(1, agentNameNew);
+            updateAgentStatement.setString(2, agentPhone);
+            int result = updateAgentStatement.executeUpdate();
+            if(result!=1)
+                returnNode = ResultSetToJson.getResponse(-1,"Error!");
+            else
+                returnNode = ResultSetToJson.getOk();
+        }
+
+        return returnNode;
+
     }
 
     @RequestMapping(
@@ -69,12 +109,21 @@ public class Agent {
     public JsonNode addAgent(
             @RequestParam(name = "agent_phone",required = true,defaultValue = "") String agentPhone,
             @RequestParam(name = "agent_name",required = true,defaultValue = "") String agentName
-    ) throws SQLException {
-        StaticDatabaseConnectionHolder.getStatement().
-                executeUpdate("INSERT INTO " +
-                        "AGENT(AGENT_PHONE,AGENT_NAME) " +
-                        "VALUE ( "+agentPhone+" , "+agentName+" )");
-        return ResultSetToJson.getOk();
+    ) throws SQLException
+    {
+        JsonNode returnNode = null;
+        if(agentPhone.isBlank() || agentName.isBlank())
+            returnNode = ResultSetToJson.getResponse(-1,"Null value provided!");
+        else {
+            addAgentStatement.setString(1, agentPhone);
+            addAgentStatement.setString(2, agentName);
+            int result = addAgentStatement.executeUpdate();
+            if (result != 0)
+                returnNode = ResultSetToJson.getResponse(-1,"Error!");
+            else
+                returnNode = ResultSetToJson.getOk();
+        }
+        return returnNode;
     }
 
 
