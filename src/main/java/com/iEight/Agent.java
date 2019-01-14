@@ -35,8 +35,8 @@ public class Agent {
             StaticDatabaseConnectionHolder.getPreparedStatement(updateAgentQuery);
     private static final PreparedStatement addAgentStatement =
             StaticDatabaseConnectionHolder.getPreparedStatement(addAgentQuery);
-    private static final PreparedStatement deleteAgentStatement =
-            StaticDatabaseConnectionHolder.getPreparedStatement(deleteAgentQuery);
+//     private static final PreparedStatement deleteAgentStatement =
+//             StaticDatabaseConnectionHolder.getPreparedStatement(deleteAgentQuery);
 
     private static final Logger logger=Logger.getLogger(Agent.class.getName());
     @RequestMapping(
@@ -57,16 +57,14 @@ public class Agent {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public JsonNode getSpecificAgent(
-            @RequestParam(name = "agent_phone", required = true, defaultValue = "") String agentPhone
+            @RequestParam(name = "agent_phone") String agentPhone
     ) throws SQLException {
 //        return StaticDatabaseConnectionHolder.getResult("SELECT * FROM AGENT WHERE AGENT_PHONE = "+agentPhone).get(0);
         JsonNode returnNode;
-        if(agentPhone.isBlank())
-            returnNode = ResultSetToJson.getResponse(-1,"Null value provided :(");
-        else {
-            getSpecificAgentStatement.setString(1, agentPhone);
-            returnNode = ResultSetToJson.getJSON(getSpecificAgentStatement.executeQuery());
-        }
+
+        getSpecificAgentStatement.setString(1, agentPhone);
+        returnNode = ResultSetToJson.getJSON(getSpecificAgentStatement.executeQuery());
+
         return returnNode;
     }
 
@@ -77,24 +75,19 @@ public class Agent {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE )
     public JsonNode updateAgent(
-            @RequestParam(name = "agent_phone",required = true, defaultValue = "") String agentPhone,
-            @RequestParam(name = "agent_name",required = true, defaultValue = "") String agentNameNew
+            @RequestParam(name = "agent_phone") String agentPhone,
+            @RequestParam(name = "agent_name") String agentNameNew
     ) throws SQLException
     {
         JsonNode returnNode = null;
-        if(agentPhone.contains("*") || agentNameNew.contains("*"))
-            returnNode = ResultSetToJson.getResponse(-1,"Dont try to hack us!");
-        else if(agentPhone.isBlank() || agentNameNew.isBlank())
-            returnNode = ResultSetToJson.getResponse(-1,"Null value provided!");
-        else {
-            updateAgentStatement.setString(1, agentNameNew);
-            updateAgentStatement.setString(2, agentPhone);
-            int result = updateAgentStatement.executeUpdate();
-            if(result!=1)
-                returnNode = ResultSetToJson.getResponse(-1,"Error!");
-            else
-                returnNode = ResultSetToJson.getOk();
-        }
+
+        updateAgentStatement.setString(1, agentNameNew);
+        updateAgentStatement.setString(2, agentPhone);
+        int result = updateAgentStatement.executeUpdate();
+        if(result!=1)
+            returnNode = ResultSetToJson.getResponse(-1,"Error!");
+        else
+            returnNode = ResultSetToJson.getOk();
 
         return returnNode;
 
@@ -107,22 +100,20 @@ public class Agent {
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
     )
     public JsonNode addAgent(
-            @RequestParam(name = "agent_phone",required = true,defaultValue = "") String agentPhone,
-            @RequestParam(name = "agent_name",required = true,defaultValue = "") String agentName
+            @RequestParam(name = "agent_phone") String agentPhone,
+            @RequestParam(name = "agent_name") String agentName
     ) throws SQLException
     {
         JsonNode returnNode = null;
-        if(agentPhone.isBlank() || agentName.isBlank())
-            returnNode = ResultSetToJson.getResponse(-1,"Null value provided!");
-        else {
-            addAgentStatement.setString(1, agentPhone);
-            addAgentStatement.setString(2, agentName);
-            int result = addAgentStatement.executeUpdate();
-            if (result != 0)
-                returnNode = ResultSetToJson.getResponse(-1,"Error!");
-            else
-                returnNode = ResultSetToJson.getOk();
-        }
+
+        addAgentStatement.setString(1, agentPhone);
+        addAgentStatement.setString(2, agentName);
+        int result = addAgentStatement.executeUpdate();
+        if (result != 0)
+            returnNode = ResultSetToJson.getResponse(-1,"Error!");
+        else
+            returnNode = ResultSetToJson.getOk();
+
         return returnNode;
     }
 
@@ -135,7 +126,7 @@ public class Agent {
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
     )
     public JsonNode deleteAgent(
-            @RequestParam(name = "agent_phone",required = true,defaultValue = "") String agnetPhone
+            @RequestParam(name = "agent_phone") String agnetPhone
     )
     {
         return ResultSetToJson.getResponse(-1,"Still not implemented!");
