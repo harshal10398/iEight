@@ -6,9 +6,11 @@ import com.iEight.util.StaticDatabaseConnectionHolder;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @RestController
@@ -37,7 +39,7 @@ public class PartyAgent {
     @RequestMapping(
             path = "/service/partyagent/all",
             method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE;
+            produces = MediaType.APPLICATION_JSON_VALUE
     )
     public JsonNode getAllPartyAgentCombos() throws SQLException {
         JsonNode returnNode = null;
@@ -45,4 +47,38 @@ public class PartyAgent {
         return returnNode;
     }
 
+    @RequestMapping(
+            path = "/service/partyagent",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
+    )
+    public JsonNode getSpecificPartyAgentCombo(
+            @RequestParam(name = "party_agent_id") int partyAgentId
+    ) throws SQLException {
+        JsonNode returnNode = null;
+        getSpecificPartyAgentComboStatement.setInt(1,partyAgentId);
+        returnNode = ResultSetToJson.getJSON(getSpecificPartyAgentComboStatement.executeQuery());
+        return returnNode;
+    }
+
+    @RequestMapping(
+            path = "/service/partyagent",
+            method = RequestMethod.PUT,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
+    )
+    public JsonNode addPartyAgentCombo(
+            @RequestParam(name = "party_gstin") String partyGstin,
+            @RequestParam(name = "agent_phone") String agentPhone
+    ) throws SQLException {
+        JsonNode returnNode = null;
+        addPartyAgentComboStatement.setString(1,partyGstin);
+        addPartyAgentComboStatement.setString(2,agentPhone);
+        if(addPartyAgentComboStatement.executeUpdate() != 1)
+            returnNode = ResultSetToJson.getResponse(-1,"failed to add party agent combo.");
+        else
+            returnNode = ResultSetToJson.getOk();
+        return returnNode;
+    }
 }
