@@ -1,6 +1,9 @@
 package com.iEight;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeCreator;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.iEight.util.ResultSetToJson;
 import com.iEight.util.StaticDatabaseConnectionHolder;
 import org.springframework.http.MediaType;
@@ -13,6 +16,8 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 public class Taaka {
@@ -29,6 +34,8 @@ public class Taaka {
     private static PreparedStatement getAllAvailableTaakasWithDateStatement = StaticDatabaseConnectionHolder.getPreparedStatement(getAllAvailableTaakasWithDateQuery);
     private static PreparedStatement addTaakaStatement = StaticDatabaseConnectionHolder.getPreparedStatement(addTaakaQuery);
     private static PreparedStatement lastTaakaNumberFinderStatement = StaticDatabaseConnectionHolder.getPreparedStatement(lastTaakaNumberFinderQuery);
+
+    private static Logger logger = Logger.getLogger(Taaka.class.getName());
     @RequestMapping(
             path = "/service/taaka/all",
             method = RequestMethod.GET,
@@ -93,7 +100,7 @@ public class Taaka {
     public JsonNode addTaaka(
             @RequestParam(name = "production_date") Date productionDate,
             @RequestParam(name = "length") double length,
-            @RequestParam(name = "qualityId") int qualityId
+            @RequestParam(name = "quality_id") int qualityId
     ) throws SQLException {
         JsonNode returnNode = null;
         lastTaakaNumberFinderStatement.setInt(1, productionDate.toLocalDate().getYear());
@@ -110,5 +117,25 @@ public class Taaka {
         else
             returnNode = ResultSetToJson.getOk();
         return returnNode;
+    }
+
+    @RequestMapping(
+            path = "/service/taaka/new_taaka_number",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+//            consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE, MediaType.ALL_VALUE}
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
+    )
+    public JsonNode getNewTaakaNumber(
+            @RequestParam(name = "production_date") Date productionDate
+    ) throws SQLException {
+        lastTaakaNumberFinderStatement.setInt(1,productionDate.toLocalDate().getYear());
+        lastTaakaNumberFinderStatement.setInt(2,productionDate.toLocalDate().getMonthValue());
+        ResultSet rs = lastTaakaNumberFinderStatement.executeQuery();
+        rs.next();
+        int newTaakaNumber = rs.getInt(1) + 1;
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode objectNode = objectMapper.createObjectNode().put("newTaakaNumber",newTaakaNumber);
+        return objectNode;
     }
 }

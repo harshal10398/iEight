@@ -39,7 +39,7 @@ public class StaticDatabaseConnectionHolder {
 
         return statement;
     }
-    public static ArrayNode getResult(String queryString){
+    public static ObjectNode getResult(String queryString){
         ResultSet rs = null;
         try {
             rs = getStatement().executeQuery(queryString);

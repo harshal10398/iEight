@@ -84,7 +84,7 @@ public class Bill {
         addBillStatement.setString(3, address);
         addBillStatement.setInt(4, due);
         addBillStatement.setDouble(5, ratePerMeter);
-        addBillStatement.setDouble(6, gst);
+        addBillStatement.setDouble(6, 5.0);
         addBillStatement.setDouble(7, totalAmount);
         addBillStatement.setInt(8, billStatus);
         if(addBillStatement.executeUpdate()!=1)

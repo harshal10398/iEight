@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Insights</title>
+    <title>Bill</title>
     <script src="https://www.w3schools.com/lib/w3.js"></script>
     <link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -15,41 +15,42 @@
     <div class="w3-bar w3-card w3-blue">
         <a href="#" class="w3-bar-item w3-button"><h3>iEight</h3></a>
         <a href="index.html" class="w3-bar-item w3-button"><h3>Insights</h3></a>
-        <a href="production.html" class="w3-bar-item w3-button"><h3>Taaka</h3></a>
         <a href="bill.html" class="w3-bar-item w3-button"><h3>Bill</h3></a>
-        <a href="collect.html" class="w3-bar-item w3-button"><h3>Collect</h3></a>
         <!--<a href="#" class="w3-bar-item w3-button"><h3>View Bills</h3></a>-->
 
+        <a href="#" class="w3-bar-item w3-button"><h3>Collect</h3></a>
+        <!--<a href="#" class="w3-bar-item w3-button"><h3>Production</h3></a>-->
 
     </div>
 </div>
 
 <!-- centered container -->
-<div class="w3-container" id="insights" style="margin-top: 80px;">
+<div class="w3-container" style="margin-top: 80px;">
+    <!-- Material card with Form -->
 
     <!-- Material card with list -->
 
     <ul class="w3-ul w3-card-4">
         <li class="w3-bar">
-            <span class="w3-bar-item w3-white w3-xlarge w3-right">{{agentCount}}</span>
+            <span class="w3-bar-item w3-white w3-xlarge w3-right">16</span>
             <div class="w3-bar-item">
                 <span class="w3-large">Agent</span>
             </div>
         </li>
         <li class="w3-bar">
-            <span class="w3-bar-item w3-white w3-xlarge w3-right">{{partyCount}}</span>
+            <span class="w3-bar-item w3-white w3-xlarge w3-right">16</span>
             <div class="w3-bar-item">
                 <span class="w3-large">Party</span>
             </div>
         </li>
         <li class="w3-bar">
-            <span class="w3-bar-item w3-white w3-xlarge w3-right">{{billCount}}</span>
+            <span class="w3-bar-item w3-white w3-xlarge w3-right">16</span>
             <div class="w3-bar-item">
                 <span class="w3-large">Bills</span>
             </div>
         </li>
         <li class="w3-bar">
-            <span class="w3-bar-item w3-white w3-xlarge w3-right">{{collectionTotalCount}}</span>
+            <span class="w3-bar-item w3-white w3-xlarge w3-right">16</span>
             <div class="w3-bar-item">
                 <span class="w3-large">Collected</span>
             </div>
@@ -63,13 +64,13 @@
             </div>
         </li>
         <li class="w3-bar">
-            <span id="" class="w3-bar-item w3-white w3-xlarge w3-right">{{taakaCount}}</span>
+            <span id="" class="w3-bar-item w3-white w3-xlarge w3-right">{{Count}}</span>
             <div class="w3-bar-item">
                 <span class="w3-large">Count</span>
             </div>
         </li>
         <li class="w3-bar">
-            <span id="" class="w3-bar-item w3-white w3-xlarge w3-right">{{taakaLength}}</span>
+            <span id="" class="w3-bar-item w3-white w3-xlarge w3-right">{{Length}}</span>
             <div class="w3-bar-item">
                 <span class="w3-large">Length</span>
             </div>
@@ -78,30 +79,18 @@
     <br>
     <ul class="w3-ul w3-card-4">
         <li class="w3-bar">
-            <span id="" class="w3-bar-item w3-white w3-xlarge w3-right">{{collectionMonthlyCount}}</span>
+            <span id="" class="w3-bar-item w3-white w3-xlarge w3-right">{{Count}}</span>
             <div class="w3-bar-item">
                 <span class="w3-large">Monthly Collection</span>
             </div>
         </li>
-        <!--
         <li class="w3-bar">
             <span id="" class="w3-bar-item w3-white w3-xlarge w3-right">{{Count}}</span>
             <div class="w3-bar-item">
                 <span class="w3-large">Remaining Collection</span>
             </div>
         </li>
-        -->
     </ul>
 </div>
 </body>
-<footer>
-
-
-</footer>
-<script>
-    w3.getHttpObject("/service/insights",myFun);
-    function myFun(x){
-        w3.displayObject("insights",x);
-    }
-</script>
 </html>

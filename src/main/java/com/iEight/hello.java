@@ -1,5 +1,6 @@
 package com.iEight;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.iEight.util.ResultSetToJson;
 //import org.json.JSONArray;
@@ -46,7 +47,7 @@ public class hello {
     }
     @RequestMapping(method = RequestMethod.GET, path = "/db", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ArrayNode dbTest(){
+    public JsonNode dbTest(){
         ResultSet rs = null;
         try {
             rs = getStatement().executeQuery("SELECT * FROM AGENT");

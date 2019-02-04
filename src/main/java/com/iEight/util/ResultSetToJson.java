@@ -13,9 +13,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ResultSetToJson {
-    public static ArrayNode getJSON(ResultSet resultSet) {
+    public static ObjectNode getJSON(ResultSet resultSet){
+        return getJSON(resultSet,"records");
+    }
+    public static ObjectNode getJSON(ResultSet resultSet, String fieldName) {
 
         ObjectMapper objectMapper=new ObjectMapper();
+        ObjectNode returnNode = objectMapper.createObjectNode();
         ArrayNode arrayNode=objectMapper.createArrayNode();
 
         try {
@@ -42,8 +46,8 @@ public class ResultSetToJson {
         } catch (SQLException sqle) {
             sqle.printStackTrace();
         }
-
-        return arrayNode;
+        returnNode.set(fieldName,arrayNode);
+        return returnNode;
     }
     public static JsonNode getOk(){
         ObjectMapper objectMapper=new ObjectMapper();

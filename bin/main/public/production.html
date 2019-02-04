@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Production</title>
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
+    <script src="functionality.js"></script>
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+<body>
+<!-- navbar -->
+<div class="w3-top">
+    <div class="w3-bar w3-card w3-blue">
+        <a href="#" class="w3-bar-item w3-button"><h3>iEight</h3></a>
+        <a href="index.html" class="w3-bar-item w3-button"><h3>Insights</h3></a>
+        <a href="production.html" class="w3-bar-item w3-button"><h3>Taaka</h3></a>
+        <a href="bill.html" class="w3-bar-item w3-button"><h3>Bill</h3></a>
+        <a href="collect.html" class="w3-bar-item w3-button"><h3>Collect</h3></a>
+        <!--<a href="#" class="w3-bar-item w3-button"><h3>View Bills</h3></a>-->
+    </div>
+</div>
+
+<!-- centered container -->
+<div class="w3-container" id="insights" style="margin-top: 80px;">
+    <!-- Material card with Form -->
+    <div class="w3-card-4" style="width: 80%; margin-left:auto; margin-right: auto;">
+        <div class="w3-container w3-blue">
+            <h2>New Taaka</h2>
+        </div>
+        <div class="w3-container" id="add-taaka-form">
+            <p>
+                <label>Date</label>
+                <input id="datePicker" class="w3-input" type="date" onchange="updateNewTaakaNumber()" value="{{today}}">
+            </p>
+
+            <p>
+                <label>Quality</label>
+                <select class="w3-select" id="qualityPicker" name="option">
+                    <option value="" disabled selected>Choose your option</option>
+                    <option value="1">AMERICAN 65</option>
+                    <option value="2">AMERICAN 85</option>
+                    <!--<option value="3"></option>-->
+                </select>
+            </p>
+            <hr>
+            <p>
+                <label>Taaka Number</label>
+                <input type="number" disabled class="w3-input" value="{{newTaakaNumber}}">
+            </p>
+            <p>
+                <label>Length</label>
+                <input type="number" class="w3-input" id="lengthInput" name="length">
+            </p>
+            <!-- <input type="submit" value="Add" onclick="submitNewTaaka()"> -->
+            <p>
+                <button class="w3-btn w3-blue" onclick="submitNewTaaka()" type="submit">Add</button>
+            </p>
+        </div>
+
+    </div>
+    <br>
+
+    <!-- Material card with table -->
+    <table id="taakas" class="w3-table-all w3-card-4">
+        <tr>
+            <th onclick="w3.sortHTML('#taakas','.row','.taaka-number')">Taaka Number</th>
+            <th onclick="w3.sortHTML('#taakas','.row','.production-date')">Production Date</th>
+            <th onclick="w3.sortHTML('#taakas','.row','.taaka-length')">Length</th>
+            <th onclick="w3.sortHTML('#taakas','.row','.quality-id')">Quality</th>
+            <th onclick="w3.sortHTML('#taakas','.row','.bill-no')">Bill</th>
+            <th onclick=""><button class="w3-btn w3-blue" onclick="openMakeBillModal()">Make Bill</button></th>
+        </tr>
+        <tr>
+            <td colspan="6"><input class="w3-input w3-border w3-animate-input" type="text" oninput="w3.filterHTML('#taakas','.row',this.value)"></td>
+            <!-- <td><input type="number" oninput="w3.filterHTML('#taakas','.row > .taaka-number',this.value)"></td> -->
+            <!-- <td><input type="date" oninput="w3.filterHTML('#taakas','.row > .production-date',this.value)"></td> -->
+            <!-- <td><input type="number" oninput="w3.filterHTML('#taakas','.row > .taaka-length',this.value)"></td> -->
+            <!-- <td><input type="number" oninput="w3.filterHTML('#taakas','.row > .quality-id',this.value)"></td> -->
+            <!-- <td><input type="number" oninput="w3.filterHTML('#taakas','.row > .bill-no',this.value)"></td> -->
+            
+        </tr>
+        <tr class="row" w3-repeat=records>
+            <td class="taaka-number">{{taaka_number}}</td>
+            <td class="production-date">{{production_date}}</td>
+            <td class="taaka-length">{{taaka_length}}</td>
+            <td class="quality-id">{{quality_id}}</td>
+            <td class="bill-no">{{bill_no}}</td>
+            <td class="bill-check"><input type="checkbox" class="w3-check bill-checkbox"></td>
+        </tr>
+    </table>
+    <br>
+    <div id="makeBillModal" class="w3-modal">
+        <div class="w3-modal-content w3-card-4">
+            <header class="w3-container w3-blue">
+                    <span onclick="$('#makeBillModal').style.display='none'" class="w3-button w3-display-topright w3-blue">&times;</span>
+                    <h2>Make Bill</h2>
+            </header>
+            <form id="makeBillForm">
+                <label>Bill No</label>
+                
+                <label>Party-Agent Combination</label>
+                <select class="w3-select" id="partyAgentSelector" w3-repeat="records">
+                        <option disabled selected value=""></option>
+                        <option value="{{party_agent_id}}">{{party_name}}({{party_gstin}}) - {{agent_name}}({{agent_phone}})</option>
+                </select>
+                <label></label>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+<footer>
+
+
+</footer>
+<script>
+    $('#datePicker').valueAsDate = new Date();
+    function updateNewTaakaNumber(){
+        xhrWithBody("GET","/service/taaka/new_taaka_number",updateNewTaakaNumberCallBack,{"production_date":$("#datePicker").value});
+    }
+    function updateNewTaakaNumberCallBack(response){
+        response.today = $("#datePicker").value;
+        response.previous = $("#qualityPicker").value;
+        if(!response.today)
+            response.today = new Date();
+        
+        console.log(response);
+        w3.displayObject("add-taaka-form",response);
+        if(response.previous)
+            $('#qualityPicker').options[response.previous].selected=true;
+    }
+    function submitNewTaaka(){
+        var sendObject = {
+            "quality_id": document.getElementById("qualityPicker").value, 
+            "production_date": document.getElementById("datePicker").value,
+            "length": document.getElementById("lengthInput").value
+        }
+        xhrWithBody("PUT","/service/taaka",function(response){console.log(response);updateNewTaakaNumber();},sendObject);
+    }
+    function updateTableData(){
+        w3.getHttpObject("/service/taaka/all",function(responseObject){
+            w3.displayObject("taakas",responseObject);
+        });
+    }
+    function openMakeBillModal(){
+        $('#makeBillModal').style.display='block';
+    }
+    updateNewTaakaNumber();
+    updateTableData();
+    /*
+    function updateNewTaakaNumber(){
+        xhr.open("GET",'/service/taaka/new_taaka_number?production_date='+document.getElementById('datePicker').value,true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        
+        xhr.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                
+                w3.displayObject("add-taaka-form",JSON.parse(this.responseText));
+                document.getElementById('datePicker').valueAsDate = new Date();
+            }
+        }
+        xhr.send();
+
+    }
+    function submitNewTaaka(){
+        var production_date=document.getElementById('datePicker').value;
+        var quality_id=document.getElementById('qualityPicker').value;
+        var length=document.getElementById('lengthInput').value;
+        console.log(production_date);
+        console.log(quality_id);
+        console.log(length);
+        var sendObject = {"quality_id": quality_id, "production_date": production_date, "length": length};
+        var params="";
+        for(key in sendObject)
+            params+=encodeURIComponent(key)+"="+encodeURIComponent(sendObject[key])+"&";
+        
+        xhr.open("PUT","/service/taaka?"+params,true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function(){
+            if(this.readyState == 4 && this.status == 200){
+                console.log(this.responseText)
+                //w3.displayObject("add-taaka-form",JSON.parse(this.response));
+                updateNewTaakaNumber();
+            }
+        }
+        xhr.send(null);
+
+    }
+    updateNewTaakaNumber();
+    */
+</script>
+</html>
