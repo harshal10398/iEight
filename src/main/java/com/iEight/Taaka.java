@@ -27,6 +27,7 @@ public class Taaka {
     private static String getAllAvailableTaakasWithDateQuery = "SELECT * FROM TAAKA WHERE YEAR(PRODUCTION_DATE) = ? AND MONTH(PRODUCTION_DATE) = ? AND BILL_NO IS NULL";
     private static String addTaakaQuery = "INSERT INTO TAAKA(PRODUCTION_DATE, TAAKA_NUMBER, TAAKA_LENGTH, QUALITY_ID) VALUE (?, ?, ?, ?)";
     private static String lastTaakaNumberFinderQuery = "SELECT MAX(TAAKA_NUMBER) FROM TAAKA WHERE YEAR(PRODUCTION_DATE) = ? AND MONTH(PRODUCTION_DATE) = ?";
+    private static String updateTaakaBillQuery = "UPDATE TAAKA SET BILL_NO = ? WHERE TAAKA_NUMBER = ?";
 
     private static PreparedStatement getAllTaakasStatement = StaticDatabaseConnectionHolder.getPreparedStatement(getAllTaakasQuery);
     private static PreparedStatement getAllTaakasWithDateStatement = StaticDatabaseConnectionHolder.getPreparedStatement(getAllTaakasWithDateQuery);
@@ -34,6 +35,7 @@ public class Taaka {
     private static PreparedStatement getAllAvailableTaakasWithDateStatement = StaticDatabaseConnectionHolder.getPreparedStatement(getAllAvailableTaakasWithDateQuery);
     private static PreparedStatement addTaakaStatement = StaticDatabaseConnectionHolder.getPreparedStatement(addTaakaQuery);
     private static PreparedStatement lastTaakaNumberFinderStatement = StaticDatabaseConnectionHolder.getPreparedStatement(lastTaakaNumberFinderQuery);
+    private static PreparedStatement updateTaakaBillStatement = StaticDatabaseConnectionHolder.getPreparedStatement(updateTaakaBillQuery);
 
     private static Logger logger = Logger.getLogger(Taaka.class.getName());
     @RequestMapping(
@@ -137,5 +139,24 @@ public class Taaka {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode objectNode = objectMapper.createObjectNode().put("newTaakaNumber",newTaakaNumber);
         return objectNode;
+    }
+    @RequestMapping(
+            path = "/service/taaka/update_bill",
+            method = RequestMethod.POST,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
+    )
+    public JsonNode updateBill(
+            @RequestParam(name = "taaka_number") int taakaNumber,
+            @RequestParam(name = "bill_number") int billNumber
+    ) throws SQLException {
+        JsonNode returnNode=null;
+        updateTaakaBillStatement.setInt(1,billNumber);
+        updateTaakaBillStatement.setInt(2,taakaNumber);
+        if(updateTaakaBillStatement.executeUpdate()!=1)
+            returnNode = ResultSetToJson.getResponse(-1,"Failed to udpate Taaka!");
+        else
+            returnNode = ResultSetToJson.getOk();
+        return returnNode;
     }
 }
