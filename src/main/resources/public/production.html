@@ -208,7 +208,7 @@
         if (!response.today)
             response.today = new Date();
 
-        console.log(response);
+        // console.log(response);
         w3.displayObject("add-taaka-form", response);
         if (response.previous)
             $('#qualityPicker').options[response.previous].selected = true;
@@ -273,36 +273,39 @@
         
     }
     function submitBill(){
+        var checkedTaakaNumbers = [];
+        var checkedBoxes = all('.bill-check');
+        for(i=0;i<checkedBoxes.length;i++){
+            if(checkedBoxes[i].children[0].checked==true)
+                /*checkedTaakaNumbers.push(checkedBoxes[i].parentElement.children[0].innerHTML + "~" 
+                    + checkedBoxes[i].parentElement.children[1].innerHTML.split('-')[0] + "~" 
+                    + checkedBoxes[i].parentElement.children[1].innerHTML.split('-')[1]);*/
+                checkedTaakaNumbers.push(({
+                    "taaka_number": Number(checkedBoxes[i].parentElement.children[0].innerHTML),
+                     "year": Number(checkedBoxes[i].parentElement.children[1].innerHTML.split('-')[0]),
+                     "month": Number(checkedBoxes[i].parentElement.children[1].innerHTML.split('-')[1])
+                    }));
+        }
         
         var sendObject = {
+            
             "party_agent_id": $('#party_agent_selector').value,
             "bill_date": $("#bill_date").value,
             "delivery_address": $('#delivery_address').value,
             "payment_due": $("#payment_due").value,
             "rate_per_meter": $('#rate_per_meter').value,
-            "total_amount": totalAmount
-        }
-        console.log(sendObject);
-        xhrWithBody("PUT","/service/bill",function(response){console.log(response);submitTaakaBill();},sendObject);
+            "total_amount": totalAmount,
+            "taakas": JSON.stringify(checkedTaakaNumbers)
+        };
+        
+        xhrWithBody("PUT","/service/bill",function(response){console.log(response);updateTableData();},sendObject);
         
     }
-    function submitTaakaBill(){
-        var checkedBoxes = all('.bill-check');
-        for(i=0;i<checkedBoxes.length;i++){
-            if(checkedBoxes[i].children[0].checked==true){
-                var sendObject = {
-                    "taaka_number": Number(checkedBoxes[i].parentElement.children[0].innerHTML),
-                    "bill_number": $('#new_bill_number').value
-                };
-                
-                xhrWithBody("POST", "/service/taaka/update_bill", function (response) { console.log(response); }, sendObject);
-            }
-        }
-    }
+    
     function removeCheckboxes(){
         var checkedBoxes = all('.bill-check');
         for(i=0;i<checkedBoxes.length;i++){
-            console.log(checkedBoxes[i].parentElement.children[4].innerHTML);
+            // console.log(checkedBoxes[i].parentElement.children[4].innerHTML);
             if(checkedBoxes[i].parentElement.children[4].innerHTML!="null"){
                 checkedBoxes[i].children[0].disabled=true;
             }
