@@ -92,6 +92,7 @@ public class Collect{
             returnNode = ResultSetToJson.getResponse(-1,"Failed to add bill.");
         else
             returnNode = ResultSetToJson.getOk();
+        Bill.updateBillStatus(billNo);
         return returnNode;
     }
 }

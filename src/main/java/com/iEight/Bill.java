@@ -23,21 +23,19 @@ import java.util.logging.Logger;
 
 import static org.springframework.http.MediaType.*;
 
-
-class TaakaClass{
-    public Integer taaka_number,year,month;
+class TaakaClass {
+    public Integer taaka_number, year, month;
 };
-
 
 @RestController
 public class Bill {
-    private static final String getAllBillsQuery = "SELECT * FROM BILL_BOOK";
+    private static final String getAllBillsQuery = "SELECT * FROM BILL_BOOK ORDER BY BILL_STATUS";
     private static final String getSpecificBillQuery = "SELECT * FROM BILL_BOOK WHERE BILL_NO = ?";
     private static final String addBillQuery = "INSERT INTO BILL_BOOK(" + "PARTY_AGENT_ID, " + "BILL_DATE,"
             + "DELIVERY_ADDRESS," + "PAYMENT_DUE," + "RATE_PER_METER," + "GST," + "TOTAL_AMOUNT," + "BILL_STATUS"
             + ") VALUE(?,?,?,?,?,?,?,?)";
     private static final String newBillNoQuery = "SELECT MAX(BILL_NO) FROM BILL_BOOK";
-    // private static final updateBillQuery = "";
+    private static final String updateBillStatusQuery = "UPDATE BILL_BOOK SET BILL_STATUS = ? WHERE BILL_NO = ?";
 
     private static final PreparedStatement getAllBillsStatement = StaticDatabaseConnectionHolder
             .getPreparedStatement(getAllBillsQuery);
@@ -47,6 +45,8 @@ public class Bill {
             .getPreparedStatement(addBillQuery);
     private static final PreparedStatement newBillNoStatement = StaticDatabaseConnectionHolder
             .getPreparedStatement(newBillNoQuery);
+    private static final PreparedStatement updateBillStatusStatement = StaticDatabaseConnectionHolder
+            .getPreparedStatement(updateBillStatusQuery);
 
     private static final Logger logger = Logger.getLogger(Bill.class.getName());
 
@@ -67,14 +67,8 @@ public class Bill {
         // BILL_NO = "+billNo);
     }
 
-    @RequestMapping(
-            path = "/service/bill",
-            method = RequestMethod.PUT,
-            produces = APPLICATION_JSON_VALUE,
-            consumes = APPLICATION_FORM_URLENCODED_VALUE
-    )
-    public JsonNode addBill(
-            @RequestParam(name = "party_agent_id") int partyAgentId,
+    @RequestMapping(path = "/service/bill", method = RequestMethod.PUT, produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_FORM_URLENCODED_VALUE)
+    public JsonNode addBill(@RequestParam(name = "party_agent_id") int partyAgentId,
             @RequestParam(name = "bill_date") java.sql.Date billDate,
             @RequestParam(name = "delivery_address") String address,
             @RequestParam(name = "payment_due", required = false, defaultValue = "20") int due,
@@ -82,9 +76,8 @@ public class Bill {
             @RequestParam(name = "gst", required = false, defaultValue = "5") double gst,
             @RequestParam(name = "total_amount") double totalAmount,
             @RequestParam(name = "bill_status", required = false, defaultValue = "0") int billStatus,
-            @RequestParam(name = "taakas") String taakasArray
-    ) throws SQLException, IOException {
-        
+            @RequestParam(name = "taakas") String taakasArray) throws SQLException, IOException {
+
         JsonNode returnNode = null;
         addBillStatement.setInt(1, partyAgentId);
         addBillStatement.setDate(2, billDate);
@@ -95,14 +88,14 @@ public class Bill {
         addBillStatement.setDouble(7, totalAmount);
         addBillStatement.setInt(8, billStatus);
         int newBillNumber = getNewBillNo().get("new_bill_number").asInt();
-        logger.info("newBillNumber: "+newBillNumber);
+        logger.info("newBillNumber: " + newBillNumber);
         if (addBillStatement.executeUpdate() != 1)
             returnNode = ResultSetToJson.getResponse(-1, "Failed to add bill!");
         else
             returnNode = ResultSetToJson.getOk();
         TaakaClass[] taakaList = new ObjectMapper().readValue(taakasArray, TaakaClass[].class);
-        for(TaakaClass taaka : taakaList){
-            logger.info(taaka.taaka_number+" "+taaka.year+" "+taaka.month+" bill: "+newBillNumber);
+        for (TaakaClass taaka : taakaList) {
+            logger.info(taaka.taaka_number + " " + taaka.year + " " + taaka.month + " bill: " + newBillNumber);
             Taaka.updateBill(taaka.taaka_number, newBillNumber, taaka.year, taaka.month);
         }
         return returnNode;
@@ -118,5 +111,13 @@ public class Bill {
             objectNode = objectMapper.createObjectNode().put("new_bill_number", newBillNumber);
         }
         return objectNode;
+    }
+
+    public static void updateBillStatus(int billNo) throws SQLException {
+        updateBillStatusStatement.setInt(1, 1);
+        updateBillStatusStatement.setInt(2, billNo);
+        if (updateBillStatusStatement.executeUpdate() != 1) {
+            throw new SQLException("some error updating bill_status...");
+        }
     }
 }

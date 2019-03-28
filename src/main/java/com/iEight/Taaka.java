@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 @RestController
 public class Taaka {
-    private static String getAllTaakasQuery = "SELECT * FROM TAAKA";
+    private static String getAllTaakasQuery = "SELECT * FROM TAAKA ORDER BY BILL_NO ";
     private static String getAllTaakasWithDateQuery = "SELECT * FROM TAAKA WHERE YEAR(PRODUCTION_DATE) = ? AND MONTH(PRODUCTION_DATE) = ?";
     private static String getAllAvailableTaakasQuery = "SELECT * FROM TAAKA WHERE BILL_NO IS NULL";
     private static String getAllAvailableTaakasWithDateQuery = "SELECT * FROM TAAKA WHERE YEAR(PRODUCTION_DATE) = ? AND MONTH(PRODUCTION_DATE) = ? AND BILL_NO IS NULL";
