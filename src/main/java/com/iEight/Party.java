@@ -81,24 +81,24 @@ public class Party {
         updatePartyAddressStatement.setString(1,gstin);
 
         String returnMsg = "Failed to update";
-        if (!partyName.isBlank()) {
+//         if (!partyName.isBlank()) {
             updatePartyNameStatement.setString(2,partyName);
             if (updatePartyNameStatement.executeUpdate() != 1) {
                 returnMsg += " name";
             }
-        }
-        if (!partyPhone.isBlank()) {
+//         }
+//         if (!partyPhone.isBlank()) {
             updatePartyPhoneStatement.setString(2, partyPhone);
             if (updatePartyPhoneStatement.executeUpdate() != 1) {
                 returnMsg += " phone";
             }
-        }
-        if (!partyAddress.isBlank()) {
+//         }
+//         if (!partyAddress.isBlank()) {
             updatePartyAddressStatement.setString(2,partyAddress);
             if (updatePartyAddressStatement.executeUpdate() != 1) {
                 returnMsg += " address";
             }
-        }
+//         }
         returnNode = ResultSetToJson.getOk();
         return returnNode;
     }
