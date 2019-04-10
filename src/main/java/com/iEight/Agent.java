@@ -22,9 +22,9 @@ import java.util.logging.Logger;
 @RestController
 public class Agent {
     private static final String getAllAgentsQuery="SELECT * FROM AGENT";
-    private static final String getSpecificAgentQuery="SELECT * FROM AGENT WHERE AGENT_PHONE = '?'";
-    private static final String updateAgentQuery="UPDATE AGENT SET AGENT_NAME = '?' WHERE AGENT_PHONE = '?'";
-    private static final String addAgentQuery="INSERT INTO AGENT(AGENT_PHONE,AGENT_NAME) VALUE('?','?')";
+    private static final String getSpecificAgentQuery="SELECT * FROM AGENT WHERE AGENT_PHONE = ?";
+    private static final String updateAgentQuery="UPDATE AGENT SET AGENT_NAME = ? WHERE AGENT_PHONE = ?";
+    private static final String addAgentQuery="INSERT INTO AGENT(AGENT_PHONE, AGENT_NAME) VALUE (?, ?)";
     private static final String deleteAgentQuery="";
 
     private static final PreparedStatement getAllAgentsStatement =
@@ -105,11 +105,13 @@ public class Agent {
     ) throws SQLException
     {
         JsonNode returnNode = null;
-
-        addAgentStatement.setString(1, agentPhone);
+        
+        addAgentStatement.setString(1,agentPhone);
         addAgentStatement.setString(2, agentName);
+        
         int result = addAgentStatement.executeUpdate();
-        if (result != 0)
+        
+        if (result != 1)
             returnNode = ResultSetToJson.getResponse(-1,"Error!");
         else
             returnNode = ResultSetToJson.getOk();
