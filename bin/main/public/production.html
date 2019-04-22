@@ -396,6 +396,9 @@
             if (checkedBoxes[i].parentElement.children[4].innerHTML != "null") {
                 checkedBoxes[i].children[0].disabled = true;
             }
+            else{
+                checkedBoxes[i].parentElement.children[4].innerHTML = "";
+            }
         }
     }
     function updatePartyAgentSelector(){
