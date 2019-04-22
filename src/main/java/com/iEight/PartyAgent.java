@@ -53,7 +53,7 @@ public class PartyAgent {
             produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
     )
-    public JsonNode getSpecificPartyAgentCombo(
+    public static JsonNode getSpecificPartyAgentCombo(
             @RequestParam(name = "party_agent_id") int partyAgentId
     ) throws SQLException {
         JsonNode returnNode = null;

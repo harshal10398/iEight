@@ -55,7 +55,7 @@ public class Party {
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public JsonNode getSpecificParty(
+    public static JsonNode getSpecificParty(
             @RequestParam(name = "gstin") String gstin
     ) throws SQLException {
         JsonNode returnNode = null;

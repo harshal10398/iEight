@@ -26,5 +26,8 @@ repositories {
 dependencies {
     compile 'org.springframework.boot:spring-boot-starter-web:+'
     compile 'mysql:mysql-connector-java:+'
+    compile 'org.apache.pdfbox:pdfbox:+'
     testCompile 'org.springframework.boot:spring-boot-starter-test:+'
+//    compile 'com.itextpdf:itextpdf:+'
+//    testCompile 'com.itextpdf:itextpdf:+'
 }

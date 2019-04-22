@@ -42,15 +42,16 @@
         <table id="bills" class="w3-table-all w3-card-4">
             <tr>
                 <th onclick="w3.sortHTML('#bills','.row','.bill-no')">Bill Number</th>
-                <th onclick="w3.sortHTML('#bills','.row','.party-agent-id')">Party Agent ID</th>
+                <!-- <th onclick="w3.sortHTML('#bills','.row','.party-agent-id')">Party Agent ID</th> -->
                 <th onclick="w3.sortHTML('#bills','.row','.bill-date')">Bill Date</th>
                 <th onclick="w3.sortHTML('#bills','.row','.delivery-address')">Delivery Address</th>
-                <th onclick="w3.sortHTML('#bills','.row','.gst')">GST</th>
-                <th onclick="w3.sortHTML('#bills','.row','.payment-due')">Payment Due</th>
-                <th onclick="w3.sortHTML('#bills','.row','.rate-per-meter')">Rate/Meter</th>
+                <!-- <th onclick="w3.sortHTML('#bills','.row','.gst')">GST</th> -->
+                <!-- <th onclick="w3.sortHTML('#bills','.row','.payment-due')">Payment Due</th> -->
+                <!-- <th onclick="w3.sortHTML('#bills','.row','.rate-per-meter')">Rate/Meter</th> -->
                 <th onclick="w3.sortHTML('#bills','.row','.total-amount')">Total Amount</th>
-                <th onclick="w3.sortHTML('#bills','.row','.bill-status')">Status</th>
+                <!-- <th onclick="w3.sortHTML('#bills','.row','.bill-status')">Status</th> -->
 
+                <th>&nbsp;</th>
                 <th>&nbsp;</th>
                 <!-- <th onclick=""><button class="w3-btn w3-blue" onclick="openMakeBillModal()">Make Bill</button></th> -->
             </tr>
@@ -82,6 +83,7 @@
                 <!-- <td class="bill-check"><input type="checkbox" class="w3-check bill-checkbox" oninput="updateTotalLength()"></td> -->
                 <td class="collect"><button class="w3-btn w3-blue"
                         onclick="openMakeCollectionModal(this)">Collect</button></td>
+                <td class="print"><button class="w3-btn w3-blue"><a target="_blank" href="/service/bill/print/{{bill_no}}">Print</a></button></td>
             </tr>
         </table>
         <br>
@@ -299,11 +301,24 @@
 
     function removeCollect() {
         var collectRecords = all('.collect');
+        var printRecords = all('.print');
         for (i = 0; i < collectRecords.length; i++) {
             // console.log(checkedBoxes[i].parentElement.children[4].innerHTML);
             if (Number(collectRecords[i].parentElement.children[8].innerHTML) >= "1") {
                 collectRecords[i].children[0].disabled = true;
+                
             }
+            else{
+                printRecords[i].children[0].disabled=true;
+
+            }
+            collectRecords[i].parentElement.children[8].style.display="none";
+            collectRecords[i].parentElement.children[6].style.display="none";
+            collectRecords[i].parentElement.children[5].style.display="none";
+            collectRecords[i].parentElement.children[4].style.display="none";
+            collectRecords[i].parentElement.children[3].style.display="none";
+            collectRecords[i].parentElement.children[1].style.display="none";
+            
         }
     }
 

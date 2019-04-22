@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 @RestController
 public class Taaka {
     private static String getAllTaakasQuery = "SELECT * FROM TAAKA ORDER BY BILL_NO ";
+    private static String getAllTaakasWithBillQuery = "SELECT T.TAAKA_NUMBER as TAAKA_NUMBER, T.PRODUCTION_DATE AS PRODUCTION_DATE, T.TAAKA_LENGTH AS TAAKA_LENGTH, Q.QUALITY_TEXT AS QUALITY_TEXT, T.BILL_NO AS BILL_NO FROM TAAKA T,TAAKA_QUALITY Q WHERE T.BILL_NO = ? AND T.QUALITY_ID = Q.QUALITY_ID";
     private static String getAllTaakasWithDateQuery = "SELECT * FROM TAAKA WHERE YEAR(PRODUCTION_DATE) = ? AND MONTH(PRODUCTION_DATE) = ?";
     private static String getAllAvailableTaakasQuery = "SELECT * FROM TAAKA WHERE BILL_NO IS NULL";
     private static String getAllAvailableTaakasWithDateQuery = "SELECT * FROM TAAKA WHERE YEAR(PRODUCTION_DATE) = ? AND MONTH(PRODUCTION_DATE) = ? AND BILL_NO IS NULL";
@@ -30,6 +31,7 @@ public class Taaka {
     private static String updateTaakaBillQuery = "UPDATE TAAKA SET BILL_NO = ? WHERE TAAKA_NUMBER = ? AND YEAR(PRODUCTION_DATE) = ? AND MONTH(PRODUCTION_DATE) = ?";
 
     private static PreparedStatement getAllTaakasStatement = StaticDatabaseConnectionHolder.getPreparedStatement(getAllTaakasQuery);
+    private static PreparedStatement getAllTaakasWithBillStatement = StaticDatabaseConnectionHolder.getPreparedStatement(getAllTaakasWithBillQuery);
     private static PreparedStatement getAllTaakasWithDateStatement = StaticDatabaseConnectionHolder.getPreparedStatement(getAllTaakasWithDateQuery);
     private static PreparedStatement getAllAvailableTaakasStatement = StaticDatabaseConnectionHolder.getPreparedStatement(getAllAvailableTaakasQuery);
     private static PreparedStatement getAllAvailableTaakasWithDateStatement = StaticDatabaseConnectionHolder.getPreparedStatement(getAllAvailableTaakasWithDateQuery);
@@ -47,6 +49,21 @@ public class Taaka {
         JsonNode returnNode = null;
         returnNode = ResultSetToJson.getJSON(getAllTaakasStatement.executeQuery());
         return returnNode;
+    }
+    @RequestMapping(
+            path = "/service/taaka/bill",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE
+    )
+    public static JsonNode getAllTaakasWithBill(
+            @RequestParam(name = "bill_no") int billNo
+    ) throws SQLException
+    {
+            JsonNode returnNode=null;
+            getAllTaakasWithBillStatement.setInt(1, billNo);
+            returnNode = ResultSetToJson.getJSON(getAllTaakasWithBillStatement.executeQuery());
+            return returnNode;
     }
     @RequestMapping(
             path = "/service/taaka/all",
