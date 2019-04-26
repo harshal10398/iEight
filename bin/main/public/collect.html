@@ -7,53 +7,37 @@
     <script src="w3.js"></script>
     <script src="functionality.js"></script>
     <link rel="stylesheet" href="w3.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="custom.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 </head>
 
 <body>
     <!-- navbar -->
-    <div class="w3-top">
-        <div class="w3-bar w3-card w3-blue">
-            <a href="#" class="w3-bar-item w3-button">
-                <h3>iEight</h3>
-            </a>
-            <a href="index.html" class="w3-bar-item w3-button">
-                <h3>Insights</h3>
-            </a>
-            <a href="production.html" class="w3-bar-item w3-button">
-                <h3>Taaka</h3>
-            </a>
-            <a href="bill.html" class="w3-bar-item w3-button">
-                <h3>Bill</h3>
-            </a>
-            <a href="collect.html" class="w3-bar-item w3-button">
-                <h3>Collect</h3>
-            </a>
-            <!--<a href="#" class="w3-bar-item w3-button"><h3>View Bills</h3></a>-->
-        </div>
+    <div class="w3-top" w3-include-html="navbar.html">
+
     </div>
 
     <!-- centered container -->
     <div class="w3-container" id="insights" style="margin-top: 80px;">
-        
+
         <!-- Material card with table -->
-        <table id="collections" class="w3-table-all w3-card-4">
-            <tr>
-                <th onclick="w3.sortHTML('#collections','.row','.bill-no')">Bill Number</th>
-                <th onclick="w3.sortHTML('#collections','.row','.entry-date')">Entry Date</th>
-                <th onclick="w3.sortHTML('#collections','.row','.payment-date')">Payment Date</th>
-                <th onclick="w3.sortHTML('#collections','.row','.bank-name')">Bank Name</th>
-                <th onclick="w3.sortHTML('#collections','.row','.party-account-no')">Party Account No.</th>
-                <th onclick="w3.sortHTML('#collections','.row','.amount')">Amount</th>
-                
-                <!-- <th onclick=""><button class="w3-btn w3-blue" onclick="openMakeBillModal()">Make Bill</button></th> -->
-            </tr>
-            <tr>
-                <!-- <td colspan="6"><input class="w3-input w3-border w3-animate-input" type="text" -->
-                <!-- oninput="w3.filterHTML('#taakas','.row',this.value)"></td> -->
-                <!-- <td><input type="number" oninput="myFilter('#taakas','.row > .taaka-number',this.value)"></td>
+        <div class="w3-responsive">
+            <table id="collections" class="w3-table-all w3-card-4">
+                <tr>
+                    <th onclick="numericalSort('#collections','.row','.bill-no')">Bill Number</th>
+                    <th onclick="w3.sortHTML('#collections','.row','.entry-date')">Entry Date</th>
+                    <th onclick="w3.sortHTML('#collections','.row','.payment-date')">Payment Date</th>
+                    <th onclick="w3.sortHTML('#collections','.row','.bank-name')">Bank Name</th>
+                    <th onclick="w3.sortHTML('#collections','.row','.party-account-no')">Party Account No.</th>
+                    <th onclick="numericalSort('#collections','.row','.amount')">Amount</th>
+
+                    <!-- <th onclick=""><button class="w3-btn w3-blue" onclick="openMakeBillModal()">Make Bill</button></th> -->
+                </tr>
+                <tr>
+                    <!-- <td colspan="6"><input class="w3-input w3-border w3-animate-input" type="text" -->
+                    <!-- oninput="w3.filterHTML('#taakas','.row',this.value)"></td> -->
+                    <!-- <td><input type="number" oninput="myFilter('#taakas','.row > .taaka-number',this.value)"></td>
                 <td><input type="date" oninput="myFilter('#taakas','.row > .production-date',this.value)"></td>
                 <td><input type="number" oninput="myFilter('#taakas','.taaka-length',this.value)"></td>
                 <td><input type="number" oninput="myFilter('#taakas','.row > .quality-id',this.value)"></td>
@@ -64,19 +48,20 @@
                 <td>
                     <p>&nbsp;</p>
                 </td> -->
-            </tr>
-            <tr class="row" w3-repeat=records>
-                <td class="bill-no">{{bill_no}}</td>
-                <td class="entry-date">{{entry_date}}</td>
-                <td class="payment-date">{{payment_date}}</td>
-                <td class="bank-name">{{bank_name}}</td>
-                <td class="party-account-no">{{party_account_no}}</td>
-                <td class="amount">{{amount}}</td>
-                
-            </tr>
-        </table>
+                </tr>
+                <tr class="row" w3-repeat=records>
+                    <td class="bill-no">{{bill_no}}</td>
+                    <td class="entry-date">{{entry_date}}</td>
+                    <td class="payment-date">{{payment_date}}</td>
+                    <td class="bank-name">{{bank_name}}</td>
+                    <td class="party-account-no">{{party_account_no}}</td>
+                    <td class="amount">{{amount}}</td>
+
+                </tr>
+            </table>
+        </div>
         <br>
-        
+
     </div>
 </body>
 <footer>
@@ -84,16 +69,17 @@
 
 </footer>
 <script>
-    
+
     var collections = null
     function updateTableData() {
         w3.getHttpObject("/service/collect/all", function (responseObject) {
             w3.displayObject("collections", responseObject);
             collections = responseObject;
-            
+
         });
     }
     updateTableData();
+    w3.includeHTML();
 </script>
 
 </html>

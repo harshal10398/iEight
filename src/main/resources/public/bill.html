@@ -7,58 +7,42 @@
     <script src="w3.js"></script>
     <script src="functionality.js"></script>
     <link rel="stylesheet" href="w3.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="custom.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 </head>
 
 <body>
     <!-- navbar -->
-    <div class="w3-top">
-        <div class="w3-bar w3-card w3-blue">
-            <a href="#" class="w3-bar-item w3-button">
-                <h3>iEight</h3>
-            </a>
-            <a href="index.html" class="w3-bar-item w3-button">
-                <h3>Insights</h3>
-            </a>
-            <a href="production.html" class="w3-bar-item w3-button">
-                <h3>Taaka</h3>
-            </a>
-            <a href="bill.html" class="w3-bar-item w3-button">
-                <h3>Bill</h3>
-            </a>
-            <a href="collect.html" class="w3-bar-item w3-button">
-                <h3>Collect</h3>
-            </a>
-            <!--<a href="#" class="w3-bar-item w3-button"><h3>View Bills</h3></a>-->
-        </div>
+    <div class="w3-top" w3-include-html="navbar.html">
+
     </div>
 
     <!-- centered container -->
     <div class="w3-container" id="insights" style="margin-top: 80px;">
-        
-        <!-- Material card with table -->
-        <table id="bills" class="w3-table-all w3-card-4">
-            <tr>
-                <th onclick="w3.sortHTML('#bills','.row','.bill-no')">Bill Number</th>
-                <!-- <th onclick="w3.sortHTML('#bills','.row','.party-agent-id')">Party Agent ID</th> -->
-                <th onclick="w3.sortHTML('#bills','.row','.bill-date')">Bill Date</th>
-                <th onclick="w3.sortHTML('#bills','.row','.delivery-address')">Delivery Address</th>
-                <!-- <th onclick="w3.sortHTML('#bills','.row','.gst')">GST</th> -->
-                <!-- <th onclick="w3.sortHTML('#bills','.row','.payment-due')">Payment Due</th> -->
-                <!-- <th onclick="w3.sortHTML('#bills','.row','.rate-per-meter')">Rate/Meter</th> -->
-                <th onclick="w3.sortHTML('#bills','.row','.total-amount')">Total Amount</th>
-                <!-- <th onclick="w3.sortHTML('#bills','.row','.bill-status')">Status</th> -->
 
-                <th>&nbsp;</th>
-                <th>&nbsp;</th>
-                <!-- <th onclick=""><button class="w3-btn w3-blue" onclick="openMakeBillModal()">Make Bill</button></th> -->
-            </tr>
-            <tr>
-                <!-- <td colspan="6"><input class="w3-input w3-border w3-animate-input" type="text" -->
-                <!-- oninput="w3.filterHTML('#taakas','.row',this.value)"></td> -->
-                <!-- <td><input type="number" oninput="myFilter('#taakas','.row > .taaka-number',this.value)"></td>
+        <!-- Material card with table -->
+        <div class="w3-responsive">
+            <table id="bills" class="w3-table-all w3-card-4">
+                <tr>
+                    <th onclick="numericalSort('#bills','.row','.bill-no')">Bill Number</th>
+                    <!-- <th onclick="w3.sortHTML('#bills','.row','.party-agent-id')">Party Agent ID</th> -->
+                    <th onclick="w3.sortHTML('#bills','.row','.bill-date')">Bill Date</th>
+                    <th onclick="w3.sortHTML('#bills','.row','.delivery-address')">Delivery Address</th>
+                    <!-- <th onclick="w3.sortHTML('#bills','.row','.gst')">GST</th> -->
+                    <!-- <th onclick="w3.sortHTML('#bills','.row','.payment-due')">Payment Due</th> -->
+                    <!-- <th onclick="w3.sortHTML('#bills','.row','.rate-per-meter')">Rate/Meter</th> -->
+                    <th onclick="numericalSort('#bills','.row','.total-amount')">Total Amount</th>
+                    <!-- <th onclick="w3.sortHTML('#bills','.row','.bill-status')">Status</th> -->
+
+                    <th>&nbsp;</th>
+                    <th>&nbsp;</th>
+                    <!-- <th onclick=""><button class="w3-btn w3-blue" onclick="openMakeBillModal()">Make Bill</button></th> -->
+                </tr>
+                <tr>
+                    <!-- <td colspan="6"><input class="w3-input w3-border w3-animate-input" type="text" -->
+                    <!-- oninput="w3.filterHTML('#taakas','.row',this.value)"></td> -->
+                    <!-- <td><input type="number" oninput="myFilter('#taakas','.row > .taaka-number',this.value)"></td>
                 <td><input type="date" oninput="myFilter('#taakas','.row > .production-date',this.value)"></td>
                 <td><input type="number" oninput="myFilter('#taakas','.taaka-length',this.value)"></td>
                 <td><input type="number" oninput="myFilter('#taakas','.row > .quality-id',this.value)"></td>
@@ -69,23 +53,25 @@
                 <td>
                     <p>&nbsp;</p>
                 </td> -->
-            </tr>
-            <tr class="row" w3-repeat=records>
-                <td class="bill-no">{{bill_no}}</td>
-                <td class="party-agent-id">{{party_agent_id}}</td>
-                <td class="bill-date">{{bill_date}}</td>
-                <td class="delivery-address">{{delivery_address}}</td>
-                <td class="gst">{{gst}}</td>
-                <td class="payment-due">{{payment_due}}</td>
-                <td class="rate-per-meter">{{rate_per_meter}}</td>
-                <td class="total-amount">{{total_amount}}</td>
-                <td class="bill-status">{{bill_status}}</td>
-                <!-- <td class="bill-check"><input type="checkbox" class="w3-check bill-checkbox" oninput="updateTotalLength()"></td> -->
-                <td class="collect"><button class="w3-btn w3-blue"
-                        onclick="openMakeCollectionModal(this)">Collect</button></td>
-                <td class="print"><button class="w3-btn w3-blue"><a target="_blank" href="/service/bill/print/{{bill_no}}">Print</a></button></td>
-            </tr>
-        </table>
+                </tr>
+                <tr class="row" w3-repeat=records>
+                    <td class="bill-no">{{bill_no}}</td>
+                    <td class="party-agent-id">{{party_agent_id}}</td>
+                    <td class="bill-date">{{bill_date}}</td>
+                    <td class="delivery-address">{{delivery_address}}</td>
+                    <td class="gst">{{gst}}</td>
+                    <td class="payment-due">{{payment_due}}</td>
+                    <td class="rate-per-meter">{{rate_per_meter}}</td>
+                    <td class="total-amount">{{total_amount}}</td>
+                    <td class="bill-status">{{bill_status}}</td>
+                    <!-- <td class="bill-check"><input type="checkbox" class="w3-check bill-checkbox" oninput="updateTotalLength()"></td> -->
+                    <td class="collect"><button class="w3-btn w3-blue"
+                            onclick="openMakeCollectionModal(this)">Collect</button></td>
+                    <td class="print"><button class="w3-btn w3-blue"><a target="_blank"
+                                href="/service/bill/print/{{bill_no}}">Print</a></button></td>
+                </tr>
+            </table>
+        </div>
         <br>
         <div id="makeCollectionModal" class="w3-modal">
             <div class="w3-modal-content w3-card-4 w3-animate-zoom" style="">
@@ -104,7 +90,8 @@
 
                             <div class="w3-row-padding w3-third">
                                 <label><b>Cheque Number</b></label>
-                                <input id="cheque_no" class="w3-input" type="number" value="" minlength="6" maxlength="6">
+                                <input id="cheque_no" class="w3-input" type="number" value="" minlength="6"
+                                    maxlength="6">
                             </div>
                             <div class="w3-row-padding w3-third">
                                 <label><b>Total Amount</b></label>
@@ -118,7 +105,8 @@
                             </div>
                             <div class="w3-row-padding w3-third">
                                 <label><b>Party Account Number</b></label>
-                                <input id="party_account_no" class="w3-input" type="text" value="" minlength="12" maxlength="18">
+                                <input id="party_account_no" class="w3-input" type="text" value="" minlength="12"
+                                    maxlength="18">
                             </div>
                             <div class="w3-row-padding w3-third">
                                 <label><b>Payment Date</b></label>
@@ -267,7 +255,7 @@
             "party_account_no": $('#party_account_no').value,
             "amount": $('#amount').value
         };
-        xhrWithBody("PUT","/service/collect",function(response){console.log(response); updateTableData()}, sendObject);
+        xhrWithBody("PUT", "/service/collect", function (response) { console.log(response); updateTableData() }, sendObject);
     }
     function submitBill() {
         var checkedTaakaNumbers = [];
@@ -306,19 +294,19 @@
             // console.log(checkedBoxes[i].parentElement.children[4].innerHTML);
             if (Number(collectRecords[i].parentElement.children[8].innerHTML) >= "1") {
                 collectRecords[i].children[0].disabled = true;
-                
-            }
-            else{
-                printRecords[i].children[0].disabled=true;
 
             }
-            collectRecords[i].parentElement.children[8].style.display="none";
-            collectRecords[i].parentElement.children[6].style.display="none";
-            collectRecords[i].parentElement.children[5].style.display="none";
-            collectRecords[i].parentElement.children[4].style.display="none";
+            else {
+                printRecords[i].children[0].disabled = true;
+
+            }
+            collectRecords[i].parentElement.children[8].style.display = "none";
+            collectRecords[i].parentElement.children[6].style.display = "none";
+            collectRecords[i].parentElement.children[5].style.display = "none";
+            collectRecords[i].parentElement.children[4].style.display = "none";
             // collectRecords[i].parentElement.children[3].style.display="none";
-            collectRecords[i].parentElement.children[1].style.display="none";
-            
+            collectRecords[i].parentElement.children[1].style.display = "none";
+
         }
     }
 
@@ -363,6 +351,7 @@
     }
     updateNewTaakaNumber();
     */
+    w3.includeHTML();
 </script>
 
 </html>

@@ -7,107 +7,106 @@
     <script src="w3.js"></script>
     <script src="functionality.js"></script>
     <link rel="stylesheet" href="w3.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="custom.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 </head>
 
 <body>
     <!-- navbar -->
-    <div class="w3-top" style="z-index: 6">
-        <div class="w3-bar w3-card w3-blue">
-            <a href="#" class="w3-bar-item w3-button">
-                <h3>iEight</h3>
-            </a>
-            <a href="index.html" class="w3-bar-item w3-button">
-                <h3>Insights</h3>
-            </a>
-            <a href="production.html" class="w3-bar-item w3-button">
-                <h3>Taaka</h3>
-            </a>
-            <a href="bill.html" class="w3-bar-item w3-button">
-                <h3>Bill</h3>
-            </a>
-            <a href="collect.html" class="w3-bar-item w3-button">
-                <h3>Collect</h3>
-            </a>
-            <!--<a href="#" class="w3-bar-item w3-button"><h3>View Bills</h3></a>-->
-        </div>
+    <div class="w3-top" w3-include-html="navbar.html">
+
     </div>
 
     <!-- centered container -->
-    <div class="w3-container" id="insights" style="margin-top: 80px;">
+    <div class="w3-container" style="margin-top: 80px;">
         <!-- Material card with Form -->
-        <div class="w3-card-4" style="width: 80%; margin-left:auto; margin-right: auto;">
-            <div class="w3-container w3-blue">
-                <h2>New Taaka</h2>
-            </div>
-            <div class="w3-container" id="add-taaka-form">
-                <p>
-                    <label>Date</label>
-                    <input id="datePicker" class="w3-input" type="date" onchange="updateNewTaakaNumber()"
-                        value="{{today}}">
-                </p>
+        <div class="w3-auto w3-row w3-card-4">
+            <div class="w3-card-4 l4 s12 m12">
+                <div class="w3-container w3-blue">
+                    <h2>New Taaka</h2>
+                </div>
+                <div class="w3-row-padding" id="add-taaka-form">
+                    <div class="w3-col">
+                        <div class="w3-half w3-container">
+                            <label>Date</label>
+                            <input id="datePicker" class="w3-input" type="date" onchange="updateNewTaakaNumber()"
+                                value="{{today}}">
+                        </div>
 
-                <p>
-                    <label>Quality</label>
-                    <select class="w3-select" id="qualityPicker" name="option">
-                        <option value="" disabled selected>Choose your option</option>
-                        <option value="1">AMERICAN 65</option>
-                        <option value="2">AMERICAN 85</option>
-                        <!--<option value="3"></option>-->
-                    </select>
-                </p>
-                <hr>
-                <p>
-                    <label>Taaka Number</label>
-                    <input type="number" disabled class="w3-input" value="{{newTaakaNumber}}">
-                </p>
-                <p>
-                    <label>Length</label>
-                    <input type="number" class="w3-input" id="lengthInput" name="length">
-                </p>
-                <!-- <input type="submit" value="Add" onclick="submitNewTaaka()"> -->
-                <p>
-                    <button class="w3-btn w3-blue" onclick="submitNewTaaka()" type="submit">Add</button>
-                </p>
-            </div>
+                        <div class="w3-half w3-container">
+                            <label>Quality</label>
+                            <select class="w3-select" id="qualityPicker" name="option">
+                                <option value="" disabled selected>Choose your option</option>
+                                <option value="1">AMERICAN 65</option>
+                                <option value="2">AMERICAN 85</option>
+                                <!--<option value="3"></option>-->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="w3-col">
+                        <div class=" w3-half w3-container">
+                            <label>Taaka Number</label>
+                            <input type="number" disabled class="w3-input" value="{{newTaakaNumber}}">
+                        </div>
+                        <div class=" w3-half w3-container">
+                            <label>Length</label>
+                            <input type="number" class="w3-input" id="lengthInput" name="length">
+                        </div>
+                    </div>
+                    <!-- <input type="submit" value="Add" onclick="submitNewTaaka()"> -->
 
+                </div>
+                <div class="w3-row-padding w3-padding w3-padding-16">
+                    <div class="w3-col w3-quarter w3-container">
+                        <button class="w3-btn w3-blue" onclick="submitNewTaaka()" type="submit">Add</button>
+                    </div>
+                </div>
+
+            </div>
         </div>
         <br>
 
         <!-- Material card with table -->
-        <table id="taakas" class="w3-table-all w3-card-4">
-            <tr>
-                <th onclick="w3.sortHTML('#taakas','.row','.taaka-number')">Taaka Number</th>
-                <th onclick="w3.sortHTML('#taakas','.row','.production-date')">Production Date</th>
-                <th onclick="w3.sortHTML('#taakas','.row','.taaka-length')">Length</th>
-                <th onclick="w3.sortHTML('#taakas','.row','.quality-id')">Quality</th>
-                <th onclick="w3.sortHTML('#taakas','.row','.bill-no')">Bill</th>
-                <th onclick=""><button class="w3-btn w3-blue" onclick="openMakeBillModal()">Make Bill</button></th>
-            </tr>
-            <tr>
-                <!-- <td colspan="6"><input class="w3-input w3-border w3-animate-input" type="text" -->
-                <!-- oninput="w3.filterHTML('#taakas','.row',this.value)"></td> -->
-                <td><input type="number" oninput="myFilter('#taakas','.row > .taaka-number',this.value)"></td>
-                <td><input type="date" oninput="myFilter('#taakas','.row > .production-date',this.value)"></td>
-                <td><input type="number" oninput="myFilter('#taakas','.taaka-length',this.value)"></td>
-                <td><input type="number" oninput="myFilter('#taakas','.row > .quality-id',this.value)"></td>
-                <td><input type="number" oninput="myFilter('#taakas','.row > .bill-no',this.value)"></td>
-                <td>
-                    <p id="total_length"></p>
-                </td>
-            </tr>
-            <tr class="row" w3-repeat=records>
-                <td class="taaka-number">{{taaka_number}}</td>
-                <td class="production-date">{{production_date}}</td>
-                <td class="taaka-length">{{taaka_length}}</td>
-                <td class="quality-id">{{quality_id}}</td>
-                <td class="bill-no">{{bill_no}}</td>
-                <td class="bill-check"><input type="checkbox" class="w3-check bill-checkbox"
-                        oninput="updateTotalLength()"></td>
-            </tr>
-        </table>
+        <div class="w3-responsive">
+            <table id="taakas" class="w3-table-all w3-card-4">
+                <tr>
+                    <th onclick="numericalSort('#taakas','.row','.taaka-number')">Taaka Number</th>
+                    <th onclick="w3.sortHTML('#taakas','.row','.production-date')">Production Date</th>
+                    <th onclick="numericalSort('#taakas','.row','.taaka-length')">Length</th>
+                    <th onclick="w3.sortHTML('#taakas','.row','.quality-text')">Quality</th>
+                    <th onclick="numericalSort('#taakas','.row','.bill-no')">Bill</th>
+                    <th onclick=""><button class="w3-btn w3-blue" onclick="openMakeBillModal()">Make Bill</button></th>
+                </tr>
+                <tr>
+                    <!-- <td colspan="6"><input class="w3-input w3-border w3-animate-input" type="text" -->
+                    <!-- oninput="w3.filterHTML('#taakas','.row',this.value)"></td> -->
+                    <td><input class="w3-input" type="number"
+                            oninput="myFilter('#taakas','.row > .taaka-number',this.value)"></td>
+                    <td><input class="w3-input" type="date"
+                            oninput="myFilter('#taakas','.row > .production-date',this.value)"></td>
+                    <td><input class="w3-input" type="number" oninput="myFilter('#taakas','.taaka-length',this.value)">
+                    </td>
+                    <td><input class="w3-input" type="number"
+                            oninput="myFilter('#taakas','.row > .quality-text',this.value)"></td>
+                    <td><input class="w3-input" type="number"
+                            oninput="myFilter('#taakas','.row > .bill-no',this.value)">
+                    </td>
+                    <td>
+                        <input class="w3-input" type="number" disabled id="total_length"></p>
+                    </td>
+                </tr>
+                <tr class="row" w3-repeat=records>
+                    <td class="taaka-number">{{taaka_number}}</td>
+                    <td class="production-date">{{production_date}}</td>
+                    <td class="taaka-length">{{taaka_length}}</td>
+                    <td class="quality-text">{{quality_text}}</td>
+                    <td class="bill-no">{{bill_no}}</td>
+                    <td class="bill-check"><input type="checkbox" class="w3-check bill-checkbox"
+                            oninput="updateTotalLength()"></td>
+                </tr>
+            </table>
+        </div>
         <br>
         <!-- Party Agent combo manager modal begins -->
         <div id="partyAgentManagerModal" class="w3-modal" style="z-index: 5;">
@@ -208,7 +207,8 @@
                         </div>
                         <div class="w3-row">
                             <div class="w3-row-padding w3-right w3-padding">
-                                <button class="w3-btn w3-blue" onclick="addPartyAgentCombo()">Add Party Agent Combo</button>
+                                <button class="w3-btn w3-blue" onclick="addPartyAgentCombo()">Add Party Agent
+                                    Combo</button>
                             </div>
                         </div>
                     </div>
@@ -262,9 +262,10 @@
                                     <option w3-repeat="records" value="{{party_agent_id}}">{{party_name}}({{gstin}}) -
                                         {{agent_name}}({{agent_phone}})</option>
                                 </select>
-                                <button class="w3-btn w3-padding w3-blue" onclick="openPartyAgentManagerModal()">Manage Party Agents</button>
+                                <button class="w3-btn w3-padding w3-blue" onclick="openPartyAgentManagerModal()">Manage
+                                    Party Agents</button>
                             </div>
-                            
+
                         </div>
                         <div class="w3-row">
                             <div class="w3-row-padding">
@@ -349,7 +350,7 @@
             }
         }
         totalLength = Number(totalLength).toFixed(2);
-        $('#total_length').innerHTML = Number(totalLength).toFixed(2);
+        $('#total_length').value = Number(totalLength).toFixed(2);
     }
     function updateAddress(i) {
         console.log(partyAgentCombos.records);
@@ -396,53 +397,56 @@
             if (checkedBoxes[i].parentElement.children[4].innerHTML != "null") {
                 checkedBoxes[i].children[0].disabled = true;
             }
-            else{
+            else {
                 checkedBoxes[i].parentElement.children[4].innerHTML = "";
             }
+            checkedBoxes[i].parentElement.children[4].style.display = "";
         }
     }
-    function updatePartyAgentSelector(){
+    function updatePartyAgentSelector() {
         w3.getHttpObject("/service/partyagent/all", function (responseObject) {
             w3.displayObject("party_agent_selector", responseObject);
             partyAgentCombos = responseObject;
         });
     }
-    function openPartyAgentManagerModal(){
-        $('#partyAgentManagerModal').style.display='block';
+    function openPartyAgentManagerModal() {
+        $('#partyAgentManagerModal').style.display = 'block';
         updatePartiesAndAgents();
     }
-    function addParty(){
+    function addParty() {
         var sendObject = {
             "gstin": $('#partyAgentManagerModal #party_gstin').value,
             "party_name": $('#partyAgentManagerModal #party_name').value,
             "party_phone": $('#partyAgentManagerModal #party_phone').value,
             "party_address": $('#partyAgentManagerModal #party_address').value
         };
-        xhrWithBody('PUT',"/service/party",function(response){console.log(response); updatePartiesAndAgents();}, sendObject);
+        xhrWithBody('PUT', "/service/party", function (response) { console.log(response); updatePartiesAndAgents(); }, sendObject);
     }
-    function addAgent(){
+    function addAgent() {
         var sendObject = {
             "agent_phone": $('#partyAgentManagerModal #agent_phone').value,
             "agent_name": $('#partyAgentManagerModal #agent_name').value
         };
-        xhrWithBody('PUT',"/service/agent",function(response){console.log(response); updatePartiesAndAgents();},sendObject);
+        xhrWithBody('PUT', "/service/agent", function (response) { console.log(response); updatePartiesAndAgents(); }, sendObject);
     }
-    function addPartyAgentCombo(){
+    function addPartyAgentCombo() {
         var sendObject = {
             "party_gstin": $('#partyAgentManagerModal #partySelector').value,
             "agent_phone": $('#partyAgentManagerModal #agentSelector').value
         };
-        xhrWithBody('PUT',"/service/partyagent",function(response){console.log(response);updatePartyAgentSelector();}, sendObject);
+        xhrWithBody('PUT', "/service/partyagent", function (response) { console.log(response); updatePartyAgentSelector(); }, sendObject);
     }
-    function updatePartiesAndAgents(){
+    function updatePartiesAndAgents() {
         w3.getHttpObject("/service/party/all", function (responseObject) {
             w3.displayObject("partySelector", responseObject);
         });
-        w3.getHttpObject("/service/agent/all",function(responseObject){
-            w3.displayObject("agentSelector",responseObject);
+        w3.getHttpObject("/service/agent/all", function (responseObject) {
+            w3.displayObject("agentSelector", responseObject);
         });
     }
     updatePartiesAndAgents();
+
+    w3.includeHTML();
 </script>
 
 </html>

@@ -5,23 +5,14 @@
     <title>Insights</title>
     <script src="w3.js"></script>
     <link rel="stylesheet" href="w3.css">
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> -->
+    <link rel="stylesheet" href="custom.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 </head>
 <body>
 <!-- navbar -->
-<div class="w3-top">
-    <div class="w3-bar w3-card w3-blue">
-        <a href="#" class="w3-bar-item w3-button"><h3>iEight</h3></a>
-        <a href="index.html" class="w3-bar-item w3-button"><h3>Insights</h3></a>
-        <a href="production.html" class="w3-bar-item w3-button"><h3>Taaka</h3></a>
-        <a href="bill.html" class="w3-bar-item w3-button"><h3>Bill</h3></a>
-        <a href="collect.html" class="w3-bar-item w3-button"><h3>Collect</h3></a>
-        <!--<a href="#" class="w3-bar-item w3-button"><h3>View Bills</h3></a>-->
-
-
-    </div>
+<div class="w3-top" style="" w3-include-html="navbar.html">
+        
 </div>
 
 <!-- centered container -->
@@ -103,5 +94,6 @@
     function myFun(x){
         w3.displayObject("insights",x);
     }
+    w3.includeHTML();
 </script>
 </html>
