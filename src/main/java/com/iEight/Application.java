@@ -15,6 +15,8 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Level;
@@ -22,9 +24,10 @@ import java.util.logging.Logger;
 
 @SpringBootApplication
 public class Application {
-    private static final Logger logger=Logger.getLogger(Application.class.getName());
+    private static final Logger logger = Logger.getLogger(Application.class.getName());
     private static ConfigurableApplicationContext context;
-    public static void main(String[] args) throws IOException, AWTException {
+
+    public static void main(String[] args) throws IOException, AWTException, URISyntaxException {
 
         if(SystemTray.isSupported()){
 
@@ -58,6 +61,8 @@ public class Application {
             }
         }
         context=SpringApplication.run(Application.class, args);
-
+        if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)){
+            Desktop.getDesktop().browse(new URI("http://localhost:8080"));
+        }
     }
 }

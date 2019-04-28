@@ -207,6 +207,9 @@ public class Bill {
         billStream.showText("Delivery Address: "+billData.get("delivery_address").asText());
 
         billStream.newLine();
+        billStream.showText("Rate/Meter:       "+billData.get("rate_per_meter").asDouble());
+
+        billStream.newLine();
         billStream.showText("Total Amount:     " + billData.get("total_amount").asDouble());
 
         billStream.newLine();
@@ -253,7 +256,7 @@ public class Bill {
         billStream.showText(billData.get("total_amount").asText());
         
         billStream.endText();
-        billStream.addRect(0,bill.getBleedBox().getHeight() - (leading*11) , bill.getBleedBox().getWidth(), 1.f);
+        billStream.addRect(0,bill.getBleedBox().getHeight() - (leading*12) , bill.getBleedBox().getWidth(), 1.f);
         billStream.fill();
 
         

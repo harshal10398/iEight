@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Insights</title>
     <script src="w3.js"></script>
+    <script src="functionality.js"></script>
     <link rel="stylesheet" href="w3.css">
     <link rel="stylesheet" href="custom.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,13 +25,13 @@
         <li class="w3-bar">
             <span class="w3-bar-item w3-white w3-xlarge w3-right">{{agentCount}}</span>
             <div class="w3-bar-item">
-                <span class="w3-large">Agent</span>
+                <span class="w3-large">Agents</span>
             </div>
         </li>
         <li class="w3-bar">
             <span class="w3-bar-item w3-white w3-xlarge w3-right">{{partyCount}}</span>
             <div class="w3-bar-item">
-                <span class="w3-large">Party</span>
+                <span class="w3-large">Parties</span>
             </div>
         </li>
         <li class="w3-bar">
@@ -74,14 +75,15 @@
                 <span class="w3-large">Monthly Collection</span>
             </div>
         </li>
-        <!--
+    </ul>
+    <br>
+    <ul class="w3-ul w3-card-4">
         <li class="w3-bar">
-            <span id="" class="w3-bar-item w3-white w3-xlarge w3-right">{{Count}}</span>
+            <span id="" class="w3-bar-item w3-white w3-xlarge w3-right">{{dueBillsCount}}</span>
             <div class="w3-bar-item">
-                <span class="w3-large">Remaining Collection</span>
+                <span class="w3-large">Bills past due date</span>
             </div>
         </li>
-        -->
     </ul>
 </div>
 </body>
@@ -90,7 +92,12 @@
 
 </footer>
 <script>
-    w3.getHttpObject("/service/insights",myFun);
+    
+    sendObject = {
+        "date": new Date().toISOString().split('T')[0]
+    };
+    xhrWithBody("GET","/service/insights",myFun,sendObject);
+    // w3.getHttpObject("/service/insights",myFun);
     function myFun(x){
         w3.displayObject("insights",x);
     }

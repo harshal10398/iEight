@@ -29,6 +29,7 @@ public class Taaka {
     private static String addTaakaQuery = "INSERT INTO TAAKA(PRODUCTION_DATE, TAAKA_NUMBER, TAAKA_LENGTH, QUALITY_ID) VALUE (?, ?, ?, ?)";
     private static String lastTaakaNumberFinderQuery = "SELECT MAX(TAAKA_NUMBER) FROM TAAKA WHERE YEAR(PRODUCTION_DATE) = ? AND MONTH(PRODUCTION_DATE) = ?";
     private static String updateTaakaBillQuery = "UPDATE TAAKA SET BILL_NO = ? WHERE TAAKA_NUMBER = ? AND YEAR(PRODUCTION_DATE) = ? AND MONTH(PRODUCTION_DATE) = ?";
+    private static String getQualitiesQuery = "SELECT * FROM TAAKA_QUALITY";
 
     private static PreparedStatement getAllTaakasStatement = StaticDatabaseConnectionHolder.getPreparedStatement(getAllTaakasQuery);
     private static PreparedStatement getAllTaakasWithBillStatement = StaticDatabaseConnectionHolder.getPreparedStatement(getAllTaakasWithBillQuery);
@@ -38,6 +39,7 @@ public class Taaka {
     private static PreparedStatement addTaakaStatement = StaticDatabaseConnectionHolder.getPreparedStatement(addTaakaQuery);
     private static PreparedStatement lastTaakaNumberFinderStatement = StaticDatabaseConnectionHolder.getPreparedStatement(lastTaakaNumberFinderQuery);
     private static PreparedStatement updateTaakaBillStatement = StaticDatabaseConnectionHolder.getPreparedStatement(updateTaakaBillQuery);
+    private static PreparedStatement getQualitiesStatement = StaticDatabaseConnectionHolder.getPreparedStatement(getQualitiesQuery);
 
     private static Logger logger = Logger.getLogger(Taaka.class.getName());
     @RequestMapping(
@@ -179,5 +181,15 @@ public class Taaka {
         else
             returnNode = ResultSetToJson.getOk();
         return returnNode;
+    }
+
+    @RequestMapping(
+            path = "/service/taaka/qualities",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public static JsonNode getQualities() throws SQLException 
+    {
+            return ResultSetToJson.getJSON(getQualitiesStatement.executeQuery());
     }
 }

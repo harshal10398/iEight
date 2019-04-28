@@ -38,8 +38,9 @@
                             <label>Quality</label>
                             <select class="w3-select" id="qualityPicker" name="option">
                                 <option value="" disabled selected>Choose your option</option>
-                                <option value="1">AMERICAN 65</option>
-                                <option value="2">AMERICAN 85</option>
+                                <option w3-repeat="records" value="{{quality_id}}">{{quality_text}}</option>
+                                <!-- <option value="1">AMERICAN 65</option>
+                                <option value="2">AMERICAN 85</option> -->
                                 <!--<option value="3"></option>-->
                             </select>
                         </div>
@@ -436,6 +437,7 @@
         };
         xhrWithBody('PUT', "/service/partyagent", function (response) { console.log(response); updatePartyAgentSelector(); }, sendObject);
     }
+
     function updatePartiesAndAgents() {
         w3.getHttpObject("/service/party/all", function (responseObject) {
             w3.displayObject("partySelector", responseObject);
@@ -445,6 +447,10 @@
         });
     }
     updatePartiesAndAgents();
+    xhrWithBody("GET","/service/taaka/qualities",function(responseObject){
+        w3.displayObject("qualityPicker",responseObject);
+    });
+    
 
     w3.includeHTML();
 </script>
