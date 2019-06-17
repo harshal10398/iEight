@@ -1,0 +1,639 @@
+-- phpMyAdmin SQL Dump
+-- version 4.8.2
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost
+-- Generation Time: Sep 06, 2018 at 06:27 AM
+-- Server version: 10.1.34-MariaDB
+-- PHP Version: 7.2.8
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `loom`
+--
+CREATE DATABASE IF NOT EXISTS `loom` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `loom`;
+
+DELIMITER $$
+--
+-- Functions
+--
+DROP FUNCTION IF EXISTS `debug_msg`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `debug_msg` (`msg` TEXT) RETURNS TEXT CHARSET latin1 begin
+/*select concat("DEBUG: ",msg);*/
+RETURN concat("DEBUG: ",msg);
+end$$
+
+DROP FUNCTION IF EXISTS `fn_validate_gstin`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `fn_validate_gstin` (`inp` CHAR(15)) RETURNS TINYINT(4) BEGIN
+	DECLARE DEBUG TINYINT;
+	DECLARE RET TINYINT;
+    DECLARE I INT;
+    DECLARE FACTOR INT;
+    DECLARE C CHAR(1);
+    DECLARE CODEPOINT INT;
+    DECLARE ADDEND INT;
+    DECLARE S INT;
+    DECLARE REMAINDER INT;
+    DELETE FROM DEBUG_TABLE;
+    
+    SET DEBUG = 1;
+    
+    IF DEBUG = 1 THEN
+    INSERT INTO DEBUG_TABLE VALUE(CONCAT("INPUT: ", inp));
+    END IF;
+    SET I = CHAR_LENGTH(inp);
+    SET FACTOR = 1;
+    SET S = 0;
+    SET RET = 0;
+    IF I <> 15 THEN
+    	SET RET = -1;
+        RETURN RET;
+    ELSE
+    	/*SET I = I - 1;*/
+    	WHILE I > 0 DO
+        	SET CODEPOINT = map_char(SUBSTRING(inp, I, 1));
+            IF DEBUG = 1 THEN
+            INSERT INTO DEBUG_TABLE VALUE("DEBUGGING WORKS!: ");
+            INSERT INTO DEBUG_TABLE VALUE (CONCAT("CHAR=",SUBSTRING(inp,I,1)));
+            /*INSERT INTO DEBUG_TABLE VALUES ("CHAR="),(SUBSTRING(inp, I, 1));*/
+            INSERT INTO DEBUG_TABLE VALUES(CONCAT("I=",I));
+            INSERT INTO DEBUG_TABLE VALUEs (CONCAT("CODEPOINT=",CODEPOINT));
+            INSERT INTO DEBUG_TABLE VALUES(CONCAT("FACTOR=",FACTOR));
+            END IF;
+            SET ADDEND = FACTOR * CODEPOINT;
+            
+            IF DEBUG = 1 THEN
+            INSERT INTO DEBUG_TABLE VALUES(CONCAT("DIGIT_I= ",ADDEND));
+            END IF;
+            
+            SET ADDEND = TRUNCATE(ADDEND / 36,0) + ( ADDEND % 36 );
+            IF DEBUG = 1 THEN
+            INSERT INTO DEBUG_TABLE VALUES(CONCAT("DIGIT=",ADDEND));
+            END IF;
+            SET S = S + ADDEND;
+            IF DEBUG = 1 THEN
+            INSERT INTO DEBUG_TABLE VALUES(CONCAT("SUM=",S));
+            END IF;
+            IF FACTOR = 2 THEN
+            	SET FACTOR = 1;
+            ELSE 
+            	SET FACTOR = 2;
+           	END IF;
+            SET I = I - 1;
+        END WHILE;
+    END IF;
+    
+    SET REMAINDER = S % 36;
+    /*RETURN S;*/
+    IF DEBUG = 1 THEN
+    	INSERT INTO DEBUG_TABLE VALUES(CONCAT("REMAINDER: ",REMAINDER));
+    END IF;
+    IF REMAINDER = 0 THEN
+    	SET RET = 1;
+    ELSE
+    	SET RET = 0;
+    END IF;
+    
+    RETURN RET;
+END$$
+
+DROP FUNCTION IF EXISTS `GET_TOTAL_PAID_AMOUNT`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `GET_TOTAL_PAID_AMOUNT` (`BILL_NO` INT(11)) RETURNS DOUBLE READS SQL DATA
+BEGIN
+	DECLARE RET DOUBLE;
+    DECLARE DEBUG TINYINT;
+    SET DEBUG = 0.0;
+    SELECT SUM(COLLECTION_BOOK.AMOUNT) INTO RET FROM COLLECTION_BOOK WHERE COLLECTION_BOOK.BILL_NO = BILL_NO GROUP BY COLLECTION_BOOK.BILL_NO;
+    IF DEBUG = 1 THEN
+	    INSERT INTO DEBUG_TABLE VALUE(CONCAT("RET=",RET));
+    END IF;
+    IF RET IS NULL THEN
+    	SET RET = 0.0;
+    END IF;
+    RETURN RET;
+END$$
+
+DROP FUNCTION IF EXISTS `map_char`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `map_char` (`c` CHAR(1)) RETURNS INT(11) BEGIN
+    DECLARE val INT;
+    SET c = UPPER(c);
+    IF ASCII(c) >= 48 AND ASCII(c) <= 57 THEN
+        SET val = ASCII(c) - 48;
+    END IF;
+    IF ASCII(c) >= 65 AND ASCII(c) <= 90 THEN
+        SET val = (ASCII(c) - 65) + 10;
+    END IF;
+    RETURN val;
+END$$
+
+DROP FUNCTION IF EXISTS `unmap_char`$$
+CREATE DEFINER=`root`@`localhost` FUNCTION `unmap_char` (`v` INT) RETURNS CHAR(1) CHARSET latin1 BEGIN
+    DECLARE c char(1);
+    IF v >= 0 AND v <=9 THEN
+        SET c = CHAR(v + 48);
+    END IF;
+    IF v >= 10 AND v <= 90 THEN
+        SET c = CHAR((v + 65) - 10);
+    END IF;
+    RETURN c;
+END$$
+
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `AGENT`
+--
+-- Creation: Aug 12, 2018 at 07:51 AM
+--
+
+DROP TABLE IF EXISTS `AGENT`;
+CREATE TABLE IF NOT EXISTS `AGENT` (
+  `AGENT_PHONE` varchar(20) NOT NULL,
+  `AGENT_NAME` varchar(256) NOT NULL,
+  PRIMARY KEY (`AGENT_PHONE`) USING BTREE,
+  KEY `INDEXER` (`AGENT_PHONE`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- RELATIONSHIPS FOR TABLE `AGENT`:
+--
+
+--
+-- Dumping data for table `AGENT`
+--
+
+INSERT INTO `AGENT` (`AGENT_PHONE`, `AGENT_NAME`) VALUES
+('27601614', 'SURENDRAKUMAR GOHEL'),
+('7016402395', 'HARSHAL GOHEL'),
+('8849244852', 'DHRUMIK SHAMRA'),
+('9824525245', 'DHRUV GOHEL');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `BILL_BOOK`
+--
+-- Creation: Aug 12, 2018 at 07:51 AM
+--
+
+DROP TABLE IF EXISTS `BILL_BOOK`;
+CREATE TABLE IF NOT EXISTS `BILL_BOOK` (
+  `BILL_NO` int(11) NOT NULL AUTO_INCREMENT,
+  `PARTY_AGENT_ID` int(11) NOT NULL,
+  `BILL_DATE` date NOT NULL,
+  `DELIVERY_ADDRESS` varchar(256) NOT NULL,
+  `PAYMENT_DUE` int(11) NOT NULL DEFAULT '20',
+  `RATE_PER_METER` double NOT NULL,
+  `GST` double NOT NULL,
+  `TOTAL_AMOUNT` double NOT NULL,
+  `BILL_STATUS` tinyint(4) NOT NULL,
+  PRIMARY KEY (`BILL_NO`),
+  KEY `BILL_BOOK_PARTY_AGENT_ID_FK` (`PARTY_AGENT_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+
+--
+-- RELATIONSHIPS FOR TABLE `BILL_BOOK`:
+--   `BILL_NO`
+--       `BILL_BOOK` -> `BILL_NO`
+--   `PARTY_AGENT_ID`
+--       `PARTY_AGENT` -> `PARTY_AGENT_ID`
+--   `PARTY_AGENT_ID`
+--       `PARTY_AGENT` -> `PARTY_AGENT_ID`
+--
+
+--
+-- Dumping data for table `BILL_BOOK`
+--
+
+INSERT INTO `BILL_BOOK` (`BILL_NO`, `PARTY_AGENT_ID`, `BILL_DATE`, `DELIVERY_ADDRESS`, `PAYMENT_DUE`, `RATE_PER_METER`, `GST`, `TOTAL_AMOUNT`, `BILL_STATUS`) VALUES
+(6, 5, '2018-06-04', 'A104, AKASH FUCKPARTMENT, NR. JULAB TOWER', 20, 15, 2.5, 8805.75, 3),
+(7, 5, '2018-06-04', 'A104, AKASH FUCKPARTMENT, NR. JULAB TOWER', 20, 41, 2.5, 21176.5, 2),
+(8, 8, '2018-06-10', 'MAMA NU GHAR KETLE?', 20, 65, 2.5, 49811.450000000004, 0),
+(9, 9, '2018-06-12', 'DIVA BALE ETLE...', 20, 24, 2.5, 22807.44, 1),
+(10, 7, '2018-06-12', 'A104, AKASH FUCKPARTMENT, NR. JULAB TOWER', 20, 75, 2.5, 72023.25, 0),
+(11, 7, '2018-07-20', '99-sarvodaya, ghatlodiya', 20, 45.5, 5, 15000, 0),
+(12, 9, '2018-07-20', '100-somewhere, somecity', 20, 45.5, 5, 15000, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `COLLECTION_BOOK`
+--
+-- Creation: Aug 12, 2018 at 07:51 AM
+--
+
+DROP TABLE IF EXISTS `COLLECTION_BOOK`;
+CREATE TABLE IF NOT EXISTS `COLLECTION_BOOK` (
+  `ENTRY_DATE` date NOT NULL,
+  `PAYMENT_DATE` date NOT NULL,
+  `BILL_NO` int(11) NOT NULL,
+  `CHEQUE_NO` int(6) NOT NULL,
+  `BANK_NAME` varchar(256) NOT NULL,
+  `PARTY_ACCOUNT_NO` varchar(18) NOT NULL,
+  `AMOUNT` double NOT NULL,
+  PRIMARY KEY (`CHEQUE_NO`,`PARTY_ACCOUNT_NO`),
+  KEY `COLLECTION_BOOK_BILL_NO_FK` (`BILL_NO`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- RELATIONSHIPS FOR TABLE `COLLECTION_BOOK`:
+--   `BILL_NO`
+--       `BILL_BOOK` -> `BILL_NO`
+--
+
+--
+-- Dumping data for table `COLLECTION_BOOK`
+--
+
+INSERT INTO `COLLECTION_BOOK` (`ENTRY_DATE`, `PAYMENT_DATE`, `BILL_NO`, `CHEQUE_NO`, `BANK_NAME`, `PARTY_ACCOUNT_NO`, `AMOUNT`) VALUES
+('2018-06-11', '2018-06-11', 7, 23456, 'testbank', '123456789123456789', 15000),
+('2018-06-11', '2018-06-11', 7, 123457, 'TESTBANK', '123456789', 6176.5),
+('2018-06-12', '2018-06-11', 6, 456789, 'KOI PAN BANK', '7852146390012', 6000),
+('2018-06-12', '2018-06-11', 6, 456790, 'KOI PAN BANK', '7852146390012', 2000),
+('2018-06-10', '2018-06-11', 6, 456792, 'KOI PAN BANK', '7852146390012', 1000),
+('2018-06-10', '2018-06-12', 9, 701640, 'HARSHALIYA_NI_BANK', '82104000081272', 10000),
+('2018-06-12', '2018-06-12', 9, 932704, 'BAPA_NI_BANK', '741500005698', 15000),
+('2018-07-20', '2018-07-18', 12, 15487898, 'ghotala bank', '082104000081279', 10000);
+
+--
+-- Triggers `COLLECTION_BOOK`
+--
+DROP TRIGGER IF EXISTS `UPDATE_BILL_BOOK_BILL_STATUS`;
+DELIMITER $$
+CREATE TRIGGER `UPDATE_BILL_BOOK_BILL_STATUS` AFTER INSERT ON `COLLECTION_BOOK` FOR EACH ROW BEGIN 
+
+	DECLARE TOTAL_AMT DOUBLE; 
+    DECLARE PAID_AMT DOUBLE; 
+    DECLARE STAT TINYINT;
+    DECLARE DEBUG TINYINT;
+    
+    SET DEBUG = 1;
+    
+    SET PAID_AMT = GET_TOTAL_PAID_AMOUNT(NEW.BILL_NO); 
+    SELECT TOTAL_AMOUNT INTO TOTAL_AMT FROM BILL_BOOK WHERE BILL_NO = NEW.BILL_NO; 
+    
+    IF TOTAL_AMT - PAID_AMT = TOTAL_AMT THEN 
+    	SET STAT = 0; 
+    ELSEIF TOTAL_AMT - PAID_AMT < TOTAL_AMT THEN
+    	SET STAT = 1; 
+    ELSEIF TOTAL_AMT - PAID_AMT = 0 THEN 
+    	SET STAT = 2; 
+    ELSEIF TOTAL_AMT - PAID_AMT < 0 THEN 
+    	SET STAT = 3; 
+    END IF; 
+    IF DEBUG = 1 THEN
+    	INSERT INTO DEBUG_TABLE VALUE('I RAN!');
+    END IF;
+    UPDATE BILL_BOOK SET BILL_STATUS = STAT WHERE BILL_NO = NEW.BILL_NO; 
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `DEBUG_TABLE`
+--
+-- Creation: Aug 12, 2018 at 07:51 AM
+--
+
+DROP TABLE IF EXISTS `DEBUG_TABLE`;
+CREATE TABLE IF NOT EXISTS `DEBUG_TABLE` (
+  `MESSAGE` text
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- RELATIONSHIPS FOR TABLE `DEBUG_TABLE`:
+--
+
+--
+-- Dumping data for table `DEBUG_TABLE`
+--
+
+INSERT INTO `DEBUG_TABLE` (`MESSAGE`) VALUES
+('INPUT: '),
+('I RAN!');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `PARTY`
+--
+-- Creation: Aug 12, 2018 at 07:51 AM
+--
+
+DROP TABLE IF EXISTS `PARTY`;
+CREATE TABLE IF NOT EXISTS `PARTY` (
+  `GSTIN` varchar(15) NOT NULL,
+  `PARTY_NAME` varchar(256) NOT NULL,
+  `PARTY_PHONE` varchar(20) NOT NULL,
+  `PARTY_ADDRESS` varchar(256) NOT NULL,
+  PRIMARY KEY (`GSTIN`) USING BTREE,
+  KEY `INDEXER` (`GSTIN`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- RELATIONSHIPS FOR TABLE `PARTY`:
+--
+
+--
+-- Dumping data for table `PARTY`
+--
+
+INSERT INTO `PARTY` (`GSTIN`, `PARTY_NAME`, `PARTY_PHONE`, `PARTY_ADDRESS`) VALUES
+('01AAAGM0289C1ZX', 'KALP PATEL', '9879842560', 'A104, AKASH FUCKPARTMENT, NR. JULAB TOWER'),
+('03AAAGM0289C1ZT', 'RAMESHBHAI PATEL', '07927606461', 'C420, BHUT BUNGLOW, BHUTIYA GALI, ANDHERI, KHOPRINAGAR'),
+('14AAAGM0289C1ZQ', 'ABC', '98765432100', 'MAMA NU GHAR KETLE'),
+('25AAAGM0289C1ZN', 'XYZ', '12345678900', 'DIVA BALE ETLE... mama nu ghar ketle'),
+('27AASCS2460H1Z0', 'Harshal Gohel', '7016402395', '99,sarvoday Nagar Part 3, Near K. K. Nagar');
+
+--
+-- Triggers `PARTY`
+--
+DROP TRIGGER IF EXISTS `STOP_INVALID_GSTIN`;
+DELIMITER $$
+CREATE TRIGGER `STOP_INVALID_GSTIN` BEFORE INSERT ON `PARTY` FOR EACH ROW BEGIN
+    INSERT INTO DEBUG_TABLE VALUE("TRIGGER EXECUTED!");
+	IF (fn_validate_gstin(NEW.GSTIN) = 0) THEN
+    	SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'INVALID GSTIN CANNOT BE INSERTED!';
+   	END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `PARTY_AGENT`
+--
+-- Creation: Aug 12, 2018 at 07:51 AM
+--
+
+DROP TABLE IF EXISTS `PARTY_AGENT`;
+CREATE TABLE IF NOT EXISTS `PARTY_AGENT` (
+  `PARTY_AGENT_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `PARTY_GSTIN` varchar(15) NOT NULL,
+  `AGENT_PHONE` varchar(20) NOT NULL,
+  PRIMARY KEY (`PARTY_AGENT_ID`),
+  UNIQUE KEY `PARTY_GSTIN` (`PARTY_GSTIN`,`AGENT_PHONE`),
+  KEY `AGENT_FK` (`AGENT_PHONE`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+
+--
+-- RELATIONSHIPS FOR TABLE `PARTY_AGENT`:
+--   `AGENT_PHONE`
+--       `AGENT` -> `AGENT_PHONE`
+--   `PARTY_GSTIN`
+--       `PARTY` -> `GSTIN`
+--   `AGENT_PHONE`
+--       `AGENT` -> `AGENT_PHONE`
+--   `PARTY_GSTIN`
+--       `PARTY` -> `GSTIN`
+--
+
+--
+-- Dumping data for table `PARTY_AGENT`
+--
+
+INSERT INTO `PARTY_AGENT` (`PARTY_AGENT_ID`, `PARTY_GSTIN`, `AGENT_PHONE`) VALUES
+(5, '01AAAGM0289C1ZX', '27601614'),
+(7, '01AAAGM0289C1ZX', '7016402395'),
+(8, '14AAAGM0289C1ZQ', '8849244852'),
+(9, '25AAAGM0289C1ZN', '9824525245');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `TAAKA`
+--
+-- Creation: Aug 12, 2018 at 07:51 AM
+--
+
+DROP TABLE IF EXISTS `TAAKA`;
+CREATE TABLE IF NOT EXISTS `TAAKA` (
+  `PRODUCTION_DATE` date NOT NULL,
+  `TAAKA_NUMBER` int(11) NOT NULL,
+  `TAAKA_LENGTH` double NOT NULL,
+  `TAAKA_WEIGHT` double DEFAULT NULL,
+  `QUALITY_ID` int(11) NOT NULL,
+  `BILL_NO` int(11) DEFAULT NULL,
+  PRIMARY KEY (`PRODUCTION_DATE`,`TAAKA_NUMBER`),
+  KEY `TAAKA_QUALITY_ID_FK` (`QUALITY_ID`),
+  KEY `TAAKA_BILL_NO_FK` (`BILL_NO`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- RELATIONSHIPS FOR TABLE `TAAKA`:
+--   `BILL_NO`
+--       `BILL_BOOK` -> `BILL_NO`
+--   `QUALITY_ID`
+--       `TAAKA_QUALITY` -> `QUALITY_ID`
+--
+
+--
+-- Dumping data for table `TAAKA`
+--
+
+INSERT INTO `TAAKA` (`PRODUCTION_DATE`, `TAAKA_NUMBER`, `TAAKA_LENGTH`, `TAAKA_WEIGHT`, `QUALITY_ID`, `BILL_NO`) VALUES
+('2018-06-04', 1, 101.1, NULL, 1, 7),
+('2018-06-04', 2, 102.2, NULL, 1, 7),
+('2018-06-04', 3, 103.3, NULL, 1, 7),
+('2018-06-04', 4, 104.4, NULL, 1, 7),
+('2018-06-04', 5, 105.5, NULL, 1, 7),
+('2018-06-04', 6, 106.6, NULL, 1, 8),
+('2018-06-04', 7, 107.7, NULL, 1, 8),
+('2018-06-04', 8, 108.8, NULL, 1, 8),
+('2018-06-04', 9, 109.9, NULL, 1, 8),
+('2018-06-04', 10, 110.1, NULL, 1, 8),
+('2018-06-04', 11, 111.11, NULL, 1, 8),
+('2018-06-04', 12, 112.12, NULL, 1, 8),
+('2018-06-04', 13, 113.13, NULL, 1, NULL),
+('2018-06-04', 14, 114.14, NULL, 1, 12),
+('2018-06-04', 15, 115.15, NULL, 1, NULL),
+('2018-06-04', 16, 161.16, NULL, 1, NULL),
+('2018-06-04', 17, 171.17, NULL, 1, NULL),
+('2018-06-04', 18, 181.18, NULL, 1, NULL),
+('2018-06-04', 19, 119.19, NULL, 2, 6),
+('2018-06-04', 20, 102.2, NULL, 2, 6),
+('2018-06-04', 21, 112.21, NULL, 2, 6),
+('2018-06-04', 22, 121.22, NULL, 2, 6),
+('2018-06-04', 23, 132.23, NULL, 2, 6),
+('2018-06-04', 24, 142.42, NULL, 2, 9),
+('2018-06-04', 25, 152.25, NULL, 2, 9),
+('2018-06-04', 26, 162.26, NULL, 2, 9),
+('2018-06-04', 27, 172.27, NULL, 2, 9),
+('2018-06-04', 28, 128.82, NULL, 2, 9),
+('2018-06-04', 29, 192.29, NULL, 2, 9),
+('2018-06-04', 30, 130.3, NULL, 2, 10),
+('2018-06-04', 31, 113.13, NULL, 2, 10),
+('2018-06-04', 32, 123.32, NULL, 2, 10),
+('2018-06-04', 33, 133.33, NULL, 2, 10),
+('2018-06-04', 34, 143.34, NULL, 2, 10),
+('2018-06-04', 35, 153.53, NULL, 2, 10),
+('2018-06-04', 36, 163.36, NULL, 2, 10),
+('2018-06-04', 37, 173.37, NULL, 2, NULL),
+('2018-07-20', 1, 105.75, NULL, 1, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `TAAKA_QUALITY`
+--
+-- Creation: Aug 12, 2018 at 07:51 AM
+--
+
+DROP TABLE IF EXISTS `TAAKA_QUALITY`;
+CREATE TABLE IF NOT EXISTS `TAAKA_QUALITY` (
+  `QUALITY_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `QUALITY_TEXT` varchar(256) NOT NULL,
+  PRIMARY KEY (`QUALITY_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+
+--
+-- RELATIONSHIPS FOR TABLE `TAAKA_QUALITY`:
+--
+
+--
+-- Dumping data for table `TAAKA_QUALITY`
+--
+
+INSERT INTO `TAAKA_QUALITY` (`QUALITY_ID`, `QUALITY_TEXT`) VALUES
+(1, 'AMERICAN_PIE'),
+(2, 'AMERICAN_65'),
+(3, 'AMERICAN_85');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `VALID_GST_RATE`
+--
+-- Creation: Aug 12, 2018 at 07:51 AM
+--
+
+DROP TABLE IF EXISTS `VALID_GST_RATE`;
+CREATE TABLE IF NOT EXISTS `VALID_GST_RATE` (
+  `RATE` double NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- RELATIONSHIPS FOR TABLE `VALID_GST_RATE`:
+--
+
+--
+-- Dumping data for table `VALID_GST_RATE`
+--
+
+INSERT INTO `VALID_GST_RATE` (`RATE`) VALUES
+(5);
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `BILL_BOOK`
+--
+ALTER TABLE `BILL_BOOK`
+  ADD CONSTRAINT `BILL_BOOK_PARTY_AGENT_ID_FK` FOREIGN KEY (`PARTY_AGENT_ID`) REFERENCES `PARTY_AGENT` (`PARTY_AGENT_ID`);
+
+--
+-- Constraints for table `COLLECTION_BOOK`
+--
+ALTER TABLE `COLLECTION_BOOK`
+  ADD CONSTRAINT `COLLECTION_BOOK_BILL_NO_FK` FOREIGN KEY (`BILL_NO`) REFERENCES `BILL_BOOK` (`BILL_NO`);
+
+--
+-- Constraints for table `PARTY_AGENT`
+--
+ALTER TABLE `PARTY_AGENT`
+  ADD CONSTRAINT `AGENT_FK` FOREIGN KEY (`AGENT_PHONE`) REFERENCES `AGENT` (`AGENT_PHONE`),
+  ADD CONSTRAINT `PARTY_FK` FOREIGN KEY (`PARTY_GSTIN`) REFERENCES `PARTY` (`GSTIN`);
+
+--
+-- Constraints for table `TAAKA`
+--
+ALTER TABLE `TAAKA`
+  ADD CONSTRAINT `TAAKA_BILL_NO_FK` FOREIGN KEY (`BILL_NO`) REFERENCES `BILL_BOOK` (`BILL_NO`),
+  ADD CONSTRAINT `TAAKA_QUALITY_ID_FK` FOREIGN KEY (`QUALITY_ID`) REFERENCES `TAAKA_QUALITY` (`QUALITY_ID`);
+
+
+--
+-- Metadata
+--
+USE `phpmyadmin`;
+
+--
+-- Metadata for table AGENT
+--
+
+--
+-- Metadata for table BILL_BOOK
+--
+
+--
+-- Metadata for table COLLECTION_BOOK
+--
+
+--
+-- Metadata for table DEBUG_TABLE
+--
+
+--
+-- Metadata for table PARTY
+--
+
+--
+-- Metadata for table PARTY_AGENT
+--
+
+--
+-- Metadata for table TAAKA
+--
+
+--
+-- Dumping data for table `pma__table_uiprefs`
+--
+
+INSERT INTO `pma__table_uiprefs` (`username`, `db_name`, `table_name`, `prefs`, `last_update`) VALUES
+('root', 'loom', 'TAAKA', '{\"sorted_col\":\"`PRODUCTION_DATE`  DESC\"}', '2018-07-21 05:01:25');
+
+--
+-- Metadata for table TAAKA_QUALITY
+--
+
+--
+-- Metadata for table VALID_GST_RATE
+--
+
+--
+-- Metadata for database loom
+--
+
+--
+-- Dumping data for table `pma__relation`
+--
+
+INSERT INTO `pma__relation` (`master_db`, `master_table`, `master_field`, `foreign_db`, `foreign_table`, `foreign_field`) VALUES
+('loom', 'BILL_BOOK', 'BILL_NO', 'loom', 'BILL_BOOK', 'BILL_NO'),
+('loom', 'BILL_BOOK', 'PARTY_AGENT_ID', 'loom', 'PARTY_AGENT', 'PARTY_AGENT_ID'),
+('loom', 'PARTY_AGENT', 'AGENT_PHONE', 'loom', 'AGENT', 'AGENT_PHONE'),
+('loom', 'PARTY_AGENT', 'PARTY_GSTIN', 'loom', 'PARTY', 'GSTIN');
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
